@@ -1,0 +1,3629 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Prix Pro V1.0D</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #1a5276;
+            --primary-light: #2980b9;
+            --primary-dark: #0e3348;
+            --accent: #e67e22;
+            --accent-light: #f39c12;
+            --accent-dark: #d35400;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f1c40f;
+            --bg: #f0f3f6;
+            --card: #ffffff;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --border: #dce1e6;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+        }
+
+        .header-row-1 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .app-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .header-btn.active {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        /* ===== HEADER ROW 2 : Expert toggle + Mode badge ===== */
+        .header-row-2 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* --- Expert Toggle --- */
+        .expert-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .expert-toggle-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .expert-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .expert-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .expert-toggle .slider {
+            position: absolute;
+            inset: 0;
+            background: var(--primary-light);
+            border-radius: 24px;
+            transition: all 0.3s;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .expert-toggle .slider::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            left: 1px;
+            top: 1px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .expert-toggle input:checked + .slider {
+            background: var(--accent);
+            border-color: var(--accent-light);
+        }
+
+        .expert-toggle input:checked + .slider::before {
+            transform: translateX(20px);
+        }
+
+        .expert-mode-indicator {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .expert-mode-indicator.normal {
+            background: rgba(41, 128, 185, 0.3);
+            color: rgba(255,255,255,0.9);
+        }
+
+        .expert-mode-indicator.expert {
+            background: rgba(230, 126, 34, 0.4);
+            color: #ffeaa7;
+        }
+
+        /* --- Mode Badge (passive) --- */
+        .mode-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .mode-badge:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .mode-badge .mode-icon {
+            margin-right: 4px;
+        }
+
+        /* ===== STEPPER ===== */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            padding: 0 4px;
+        }
+
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .step-indicator.active .step-circle {
+            background: white;
+            color: var(--primary-dark);
+            border-color: white;
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.25);
+        }
+
+        .step-indicator.done .step-circle {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .step-label {
+            font-size: 9px;
+            margin-top: 4px;
+            color: rgba(255,255,255,0.4);
+            text-align: center;
+            max-width: 60px;
+            line-height: 1.2;
+            font-weight: 500;
+        }
+
+        .step-indicator.active .step-label {
+            color: white;
+            font-weight: 600;
+        }
+
+        .step-indicator.done .step-label {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .step-line {
+            width: 20px;
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+            margin: 0 2px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .step-line.done {
+            background: var(--success);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 16px;
+            padding-bottom: 80px; /* space for nav footer */
+        }
+
+        /* ===== STEP PANELS ===== */
+        .step-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .step-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+
+        .step-subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .icon {
+            font-size: 18px;
+        }
+
+        /* ===== EXPERT-ONLY SECTIONS ===== */
+        .expert-only {
+            display: none;
+        }
+
+        body.expert-mode .expert-only {
+            display: block;
+        }
+
+        /* Expert card visual distinction */
+        body.expert-mode .expert-only.card {
+            border-left: 3px solid var(--accent);
+            background: linear-gradient(135deg, #fff9f0, var(--card));
+        }
+
+        .expert-badge {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--accent);
+            color: white;
+            padding: 1px 6px;
+            border-radius: 3px;
+            margin-left: 8px;
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .form-hint {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--text);
+            background: white;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.12);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* ===== TOGGLE CHOICE (Unique / Série / Service) ===== */
+        .toggle-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .toggle-option {
+            padding: 14px 8px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .toggle-option:hover {
+            border-color: var(--primary-light);
+        }
+
+        .toggle-option.selected {
+            border-color: var(--primary);
+            background: rgba(26, 82, 118, 0.05);
+        }
+
+        .toggle-option .toggle-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .toggle-option .toggle-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .toggle-option .toggle-desc {
+            font-size: 10px;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        /* ===== CONDITIONAL PANEL ===== */
+        .conditional-panel {
+            display: none;
+            margin-top: 12px;
+            padding: 16px;
+            background: rgba(230, 126, 34, 0.06);
+            border: 1.5px solid rgba(230, 126, 34, 0.2);
+            border-radius: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .conditional-panel.visible {
+            display: block;
+        }
+
+        /* ===== ITEM LIST (matières, composants, équipement, logiciels) ===== */
+        .item-list-header {
+            display: grid;
+            gap: 10px;
+            padding: 8px 12px;
+            background: rgba(26, 82, 118, 0.06);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .item-row {
+            display: grid;
+            gap: 10px;
+            padding: 10px 12px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 6px;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .item-row:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .item-row input, .item-row select {
+            width: 100%;
+            padding: 8px;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .item-total {
+            text-align: center;
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 14px;
+        }
+
+        .btn-remove {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: var(--danger);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-light);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-add:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+            background: rgba(41, 128, 185, 0.04);
+        }
+
+        /* ===== TIME INPUTS ===== */
+        .time-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .time-field {
+            text-align: center;
+        }
+
+        .time-field label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+            padding-right: 18px; /* offset for number spinner arrows */
+        }
+
+        .time-field input {
+            width: 100%;
+            text-align: center;
+            padding: 8px;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-prev {
+            background: var(--bg);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+
+        .btn-prev:hover { background: var(--border); }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-next:hover { background: var(--primary-dark); }
+
+        .btn-calculate {
+            background: var(--accent);
+            color: white;
+            width: 100%;
+            justify-content: center;
+            font-size: 17px;
+            padding: 14px;
+        }
+
+        .btn-calculate:hover { background: var(--accent-dark); }
+
+        /* ===== RESULTS (Step 6) ===== */
+        .result-big {
+            text-align: center;
+            padding: 24px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            border-radius: var(--radius);
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .result-big .result-label { font-size: 13px; opacity: 0.8; margin-bottom: 4px; }
+        .result-big .result-price { font-size: 42px; font-weight: 800; letter-spacing: -1px; }
+        .result-big .result-unit { font-size: 14px; opacity: 0.7; margin-top: 4px; }
+
+        .result-breakdown { padding: 0; }
+
+        .result-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .result-line:last-child { border-bottom: none; }
+
+        .result-line.highlight {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 15px;
+            padding: 14px 0;
+        }
+
+        .result-line.total {
+            font-weight: 800;
+            font-size: 17px;
+            color: var(--accent);
+            border-top: 2px solid var(--border);
+            padding-top: 14px;
+        }
+
+        .result-line .label { color: var(--text-light); }
+        .result-line.highlight .label,
+        .result-line.total .label { color: var(--text); }
+
+        .profit-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 12px;
+        }
+
+        .profit-indicator.positive {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+        }
+
+        .profit-indicator.negative {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+        }
+
+        /* ===== OPTIONAL BADGE ===== */
+        .optional-badge {
+            font-size: 10px;
+            background: rgba(241, 196, 15, 0.2);
+            color: #b7950b;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        /* ===== NAVIGATION FOOTER ===== */
+        .nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+            z-index: 50;
+        }
+
+        .nav-footer-inner {
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ===== COLLAPSIBLE SECTIONS ===== */
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 12px 0;
+            user-select: none;
+        }
+
+        .collapsible-header .chevron {
+            transition: transform 0.3s;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .collapsible-header.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-body {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .collapsible-body.open {
+            display: block;
+        }
+
+        /* ===== NOTIFICATION ===== */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 200;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .notification.show { transform: translateX(0); }
+        .notification.info { background: var(--primary); color: white; }
+        .notification.success { background: var(--success); color: white; }
+        .notification.error { background: var(--danger); color: white; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .app-title { font-size: 14px; }
+            .step-circle { width: 28px; height: 28px; font-size: 12px; }
+            .step-label { font-size: 8px; max-width: 50px; }
+            .step-line { width: 12px; }
+            .step-title { font-size: 19px; }
+            .main-content { padding: 12px; padding-bottom: 80px; }
+            .card { padding: 16px; }
+            .form-row { grid-template-columns: 1fr; }
+            .toggle-choice { grid-template-columns: 1fr; }
+            .btn { padding: 10px 16px; font-size: 14px; }
+            .result-big .result-price { font-size: 36px; }
+            .header-btn { padding: 4px 8px; font-size: 12px; }
+            .expert-toggle-label { font-size: 11px; }
+            .expert-mode-indicator { font-size: 9px; }
+            .mode-badge { font-size: 10px; }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .step-line { width: 16px; }
+        }
+
+        /* ===== MATERIAL MODE TOGGLE (direct / contenant) ===== */
+        .mode-toggle-mini {
+            display: inline-flex;
+            gap: 0;
+            background: var(--bg);
+            border-radius: 6px;
+            padding: 2px;
+            margin-bottom: 8px;
+        }
+
+        .mode-toggle-mini button {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .mode-toggle-mini button.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ===== MATERIAL/COMPONENT ROW (mobile-friendly stacked) ===== */
+        .item-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 8px;
+            position: relative;
+            transition: box-shadow 0.2s;
+        }
+
+        .item-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .item-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .item-card-header .item-number {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            background: rgba(26, 82, 118, 0.08);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .item-card-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .item-card-fields.cols-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .item-card-fields .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-card-fields .field-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .item-card-fields input,
+        .item-card-fields select {
+            padding: 8px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--text);
+            background: white;
+            width: 100%;
+        }
+
+        .item-card-fields input:focus,
+        .item-card-fields select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.1);
+        }
+
+        .item-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .item-card-total {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .item-card-total .total-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-right: 6px;
+        }
+
+        /* ===== SECTION TOTAL ===== */
+        .section-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: rgba(26, 82, 118, 0.06);
+            border-radius: 8px;
+            margin-top: 12px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 15px;
+        }
+
+        /* ===== NAME INPUT FULL WIDTH ===== */
+        .item-card-name {
+            margin-bottom: 10px;
+        }
+
+        .item-card-name input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .item-card-name input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.1);
+        }
+
+        /* ===== TOGGLE YES/NO ===== */
+        .toggle-yesno {
+            display: inline-flex;
+            gap: 0;
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .toggle-yesno button {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .toggle-yesno button.active-yes {
+            background: var(--success);
+            color: white;
+        }
+
+        .toggle-yesno button.active-no {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* ===== INFO BOX ===== */
+        .info-box {
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .info-box.info {
+            background: rgba(41, 128, 185, 0.08);
+            color: var(--primary);
+            border: 1px solid rgba(41, 128, 185, 0.15);
+        }
+
+        .info-box.warning {
+            background: rgba(230, 126, 34, 0.08);
+            color: var(--accent-dark);
+            border: 1px solid rgba(230, 126, 34, 0.15);
+        }
+
+        /* ===== SUMMARY BOX (hourly rate result) ===== */
+        .summary-box {
+            padding: 16px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .summary-box .summary-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .summary-box .summary-value {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .summary-box .summary-detail {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        /* ===== PROJECT ACTIONS (save/load buttons) ===== */
+        .action-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn-action:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+            background: rgba(41, 128, 185, 0.04);
+        }
+
+        @media (max-width: 480px) {
+            .item-card-fields {
+                grid-template-columns: 1fr 1fr;
+            }
+            .item-card-fields.cols-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .item-card-fields.cols-3 .field-group:first-child {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* ===== PROJECTS MODAL ===== */
+        .projects-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .projects-modal {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            max-width: 480px;
+            width: 100%;
+            max-height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .projects-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .projects-modal-header h3 { font-size: 16px; margin: 0; }
+        .projects-modal-close {
+            background: none; border: none;
+            font-size: 20px; cursor: pointer;
+            color: var(--text-light);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .projects-modal-close:hover { background: var(--bg); }
+        .projects-modal-list {
+            overflow-y: auto;
+            padding: 8px;
+        }
+        .project-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .project-list-item:hover { background: var(--bg); }
+        .project-list-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+        .project-list-icon { font-size: 20px; }
+        .project-list-name {
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .project-list-date {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        .project-list-delete {
+            background: none; border: none;
+            font-size: 16px; cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            opacity: 0.4;
+            transition: opacity 0.15s;
+        }
+        .project-list-delete:hover { opacity: 1; }
+        .projects-modal-footer {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+        }
+        .projects-modal-footer .btn-action {
+            flex: 1;
+            font-size: 13px;
+            padding: 8px 12px;
+        }
+
+        /* ===== COPYRIGHT ===== */
+        .copyright-footer {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-light);
+            padding: 16px 20px 80px;
+            opacity: 0.6;
+        }
+
+        /* ===== HELPERS ===== */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-8 { margin-top: 8px; }
+        .mt-16 { margin-top: 16px; }
+        .mb-8 { margin-bottom: 8px; }
+        .text-muted { color: var(--text-light); font-size: 13px; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <!-- Row 1: Title + Language + Save -->
+        <div class="header-row-1">
+            <div class="app-title" data-i18n="app_title">Calculateur de Prix Pro</div>
+            <div class="header-actions">
+                <button class="header-btn" id="btnLangFr" onclick="setLanguage('fr')">FR</button>
+                <button class="header-btn" id="btnLangEn" onclick="setLanguage('en')">EN</button>
+                <button class="header-btn" onclick="saveProject()">💾</button>
+            </div>
+        </div>
+
+        <!-- Row 2: Expert toggle + Mode badge -->
+        <div class="header-row-2">
+            <div class="expert-toggle-wrapper">
+                <label class="expert-toggle" for="expertToggle">
+                    <input type="checkbox" id="expertToggle" onchange="toggleExpertMode()">
+                    <span class="slider"></span>
+                </label>
+                <span class="expert-toggle-label" data-i18n="expert_mode" onclick="document.getElementById('expertToggle').click()">Mode expert</span>
+                <span class="expert-mode-indicator normal" id="expertIndicator" data-i18n="mode_normal">Normal</span>
+            </div>
+            <div class="mode-badge" id="modeBadge" onclick="goToStep(1)" title="Cliquer pour modifier">
+                <span class="mode-icon">🎨</span>
+                <span id="modeBadgeText" data-i18n="single_piece">Pièce unique</span>
+            </div>
+        </div>
+
+        <!-- Stepper -->
+        <div class="stepper" id="stepper">
+            <!-- Generated by JS -->
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content" id="mainContent">
+
+        <!-- ===== ÉTAPE 1 : MON PROJET ===== -->
+        <div class="step-panel active" data-step="1">
+            <h2 class="step-title" data-i18n="step1_title">Mon Projet</h2>
+            <p class="step-subtitle" data-i18n="step1_subtitle">Identifiez votre produit ou prestation</p>
+
+            <div class="card">
+                <div class="card-title"><span class="icon">📋</span> <span data-i18n="project_info">Informations du projet</span></div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="project_name">Nom du projet</label>
+                    <input type="text" class="form-input" id="projectName" data-i18n-placeholder="project_name_placeholder" placeholder="Ex: Lithophane client Dupont">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="project_number">Numéro</label>
+                        <input type="text" class="form-input" id="projectNumber" value="#00001-2026" readonly style="background: var(--bg);">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="category">Catégorie</label>
+                        <select class="form-select" id="projectCategory">
+                            <option value="lithophane">Lithophanes</option>
+                            <option value="technical">Pièces techniques</option>
+                            <option value="decorative">Décoratif</option>
+                            <option value="figurine">Figurines</option>
+                            <option value="prototype">Prototypage</option>
+                            <option value="other">Autre</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="action-row">
+                    <button class="btn-action" onclick="loadProject()">📂 <span data-i18n="load">Charger</span></button>
+                    <button class="btn-action" onclick="saveProject()">💾 <span data-i18n="save">Sauvegarder</span></button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><span class="icon">📐</span> <span data-i18n="production_type">Type de production</span></div>
+                <!-- Toggle Unique / Série / Service -->
+                <div class="form-group">
+                    <div class="toggle-choice" id="productionTypeChoice">
+                        <div class="toggle-option selected" onclick="selectProductionType('unique', this)">
+                            <div class="toggle-icon">🎨</div>
+                            <div class="toggle-label" data-i18n="single_piece">Pièce unique</div>
+                            <div class="toggle-desc" data-i18n="single_piece_desc">Sur mesure</div>
+                        </div>
+                        <div class="toggle-option" onclick="selectProductionType('series', this)">
+                            <div class="toggle-icon">📦</div>
+                            <div class="toggle-label" data-i18n="series">Série</div>
+                            <div class="toggle-desc" data-i18n="series_desc">Plusieurs exemplaires</div>
+                        </div>
+                        <div class="toggle-option" onclick="selectProductionType('service', this)">
+                            <div class="toggle-icon">🔧</div>
+                            <div class="toggle-label" data-i18n="service">Service</div>
+                            <div class="toggle-desc" data-i18n="service_desc">Temps & expertise</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conditional : Série quantity -->
+                <div class="conditional-panel" id="seriesPanel">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="how_many_pieces">Combien de pièces dans cette série ?</label>
+                        <input type="number" class="form-input" id="seriesQuantity" value="10" min="2" style="max-width: 150px;">
+                    </div>
+                    <p class="form-hint" data-i18n="series_hint">💡 Les coûts de conception et prototypage seront automatiquement répartis sur chaque pièce.</p>
+                </div>
+            </div>
+
+            <!-- Expert only : project management -->
+            <div class="card expert-only">
+                <div class="card-title">
+                    <span class="icon">⚙️</span> 
+                    <span data-i18n="counter_management">Gestion compteur</span>
+                    <span class="expert-badge">Expert</span>
+                </div>
+                <p class="text-muted">[Expert : gestion compteur, import/export JSON — migré en 1B]</p>
+            </div>
+        </div>
+
+        <!-- ===== ÉTAPE 2 : MATIÈRES & COMPOSANTS ===== -->
+        <div class="step-panel" data-step="2">
+            <h2 class="step-title" data-i18n="step2_title">Matières & Composants</h2>
+            <p class="step-subtitle" data-i18n="step2_subtitle">Ce qui entre physiquement dans votre produit</p>
+
+            <!-- MATIÈRES PREMIÈRES -->
+            <div class="card">
+                <div class="card-title"><span class="icon">🧵</span> <span data-i18n="raw_materials">Matières premières</span></div>
+
+                <div id="materialsList">
+                    <!-- Dynamic rows inserted here by JS -->
+                </div>
+
+                <button class="btn-add" onclick="addMaterial()">+ <span data-i18n="add_material">Ajouter une matière</span></button>
+
+                <div class="section-total" id="materialsTotalRow" style="display:none;">
+                    <span data-i18n="total_materials">Total matières</span>
+                    <span id="materialsTotal">0.00€</span>
+                </div>
+            </div>
+
+            <!-- COMPOSANTS & FOURNITURES -->
+            <div class="card">
+                <div class="card-title"><span class="icon">🔩</span> <span data-i18n="components">Composants & Fournitures</span></div>
+
+                <div id="componentsList">
+                    <!-- Dynamic rows inserted here by JS -->
+                </div>
+
+                <button class="btn-add" onclick="addComponent()">+ <span data-i18n="add_component">Ajouter un composant</span></button>
+
+                <div class="section-total" id="componentsTotalRow" style="display:none;">
+                    <span data-i18n="total_components">Total composants</span>
+                    <span id="componentsTotal">0.00€</span>
+                </div>
+            </div>
+
+            <!-- EXPERT : Base de données -->
+            <div class="card expert-only">
+                <div class="card-title">
+                    <span class="icon">🗄️</span>
+                    <span data-i18n="database">Base de données</span>
+                    <span class="expert-badge">Expert</span>
+                </div>
+                <p class="text-muted">[Expert : BDD matières + composants, import/export xlsx — à développer]</p>
+            </div>
+        </div>
+
+        <!-- ===== ÉTAPE 3 : TEMPS DE PRODUCTION ===== -->
+        <div class="step-panel" data-step="3">
+            <h2 class="step-title" data-i18n="step3_title">Temps de production</h2>
+            <p class="step-subtitle" data-i18n="step3_subtitle">Combien de temps pour produire ce projet</p>
+
+            <!-- TEMPS MACHINE (masqué en service) -->
+            <div class="card" id="cardMachineTime">
+                <div class="card-title"><span class="icon">🖨️</span> <span data-i18n="machine_time">Temps machine / équipement</span></div>
+                
+                <div class="form-group">
+                    <label class="form-label" data-i18n="printing">Production</label>
+                    <div class="time-group">
+                        <div class="time-field">
+                            <label data-i18n="hours">Heures</label>
+                            <input type="number" id="machPrintH" value="0" min="0">
+                        </div>
+                        <div class="time-field">
+                            <label data-i18n="minutes">Minutes</label>
+                            <input type="number" id="machPrintM" value="0" min="0" max="59">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" data-i18n="calibration">Mise en route</label>
+                    <div class="time-group">
+                        <div class="time-field">
+                            <label data-i18n="hours">Heures</label>
+                            <input type="number" id="machCalibH" value="0" min="0">
+                        </div>
+                        <div class="time-field">
+                            <label data-i18n="minutes">Minutes</label>
+                            <input type="number" id="machCalibM" value="0" min="0" max="59">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPS HUMAIN -->
+            <div class="card">
+                <div class="card-title"><span class="icon">👤</span> <span data-i18n="human_time">Temps humain</span></div>
+                
+                <div class="form-group">
+                    <label class="form-label" data-i18n="design">Conception / Design</label>
+                    <div class="time-group">
+                        <div class="time-field">
+                            <label data-i18n="hours">Heures</label>
+                            <input type="number" id="humanDesignH" value="0" min="0">
+                        </div>
+                        <div class="time-field">
+                            <label data-i18n="minutes">Minutes</label>
+                            <input type="number" id="humanDesignM" value="0" min="0" max="59">
+                        </div>
+                    </div>
+                    <div class="info-box info" id="designSeriesHint" style="display:none;">
+                        💡 <span data-i18n="design_series_hint">En mode série, ce temps sera réparti sur l'ensemble des pièces.</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" data-i18n="preparation">Préparation</label>
+                    <div class="time-group">
+                        <div class="time-field">
+                            <label data-i18n="hours">Heures</label>
+                            <input type="number" id="humanPrepH" value="0" min="0">
+                        </div>
+                        <div class="time-field">
+                            <label data-i18n="minutes">Minutes</label>
+                            <input type="number" id="humanPrepM" value="0" min="0" max="59">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="supervisionGroup">
+                    <label class="form-label" data-i18n="supervision">Surveillance</label>
+                    <div class="time-group">
+                        <div class="time-field">
+                            <label data-i18n="hours">Heures</label>
+                            <input type="number" id="humanSupervH" value="0" min="0">
+                        </div>
+                        <div class="time-field">
+                            <label data-i18n="minutes">Minutes</label>
+                            <input type="number" id="humanSupervM" value="0" min="0" max="59">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" data-i18n="post_processing">Post-traitement / Finition</label>
+                    <div class="time-group">
+                        <div class="time-field">
+                            <label data-i18n="hours">Heures</label>
+                            <input type="number" id="humanPostH" value="0" min="0">
+                        </div>
+                        <div class="time-field">
+                            <label data-i18n="minutes">Minutes</label>
+                            <input type="number" id="humanPostM" value="0" min="0" max="59">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" data-i18n="assembly">Assemblage</label>
+                    <div class="time-group">
+                        <div class="time-field">
+                            <label data-i18n="hours">Heures</label>
+                            <input type="number" id="humanAssemblyH" value="0" min="0">
+                        </div>
+                        <div class="time-field">
+                            <label data-i18n="minutes">Minutes</label>
+                            <input type="number" id="humanAssemblyM" value="0" min="0" max="59">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXPERT : Templates -->
+            <div class="card expert-only">
+                <div class="card-title">
+                    <span class="icon">📋</span>
+                    <span data-i18n="time_templates">Templates de temps</span>
+                    <span class="expert-badge">Expert</span>
+                </div>
+                <p class="text-muted">[Expert : templates de temps sauvegardés — à développer]</p>
+            </div>
+        </div>
+
+        <!-- ===== ÉTAPE 4 : MON BUSINESS ===== -->
+        <div class="step-panel" data-step="4">
+            <h2 class="step-title" data-i18n="step4_title">Mon Business</h2>
+            <p class="step-subtitle" data-i18n="step4_subtitle">Vos coûts d'exploitation — à remplir une fois</p>
+
+            <!-- ÉQUIPEMENT (liste dynamique) -->
+            <div class="card">
+                <div class="card-title"><span class="icon">🏭</span> <span data-i18n="equipment_amort_title">Équipement — Amortissement</span></div>
+
+                <div id="equipmentList">
+                    <!-- Dynamic rows inserted by JS -->
+                </div>
+
+                <button class="btn-add" onclick="addEquipment()">+ <span data-i18n="add_equipment">Ajouter un équipement</span></button>
+
+                <div class="section-total" id="equipmentTotalRow" style="display:none;">
+                    <span data-i18n="equipment_hourly_cost">Coût horaire équipement</span>
+                    <span id="equipmentHourlyCost">0.00€/h</span>
+                </div>
+            </div>
+
+            <!-- LOGICIELS (liste dynamique) -->
+            <div class="card">
+                <div class="card-title"><span class="icon">💻</span> <span data-i18n="software">Logiciels</span></div>
+
+                <div id="softwareList">
+                    <!-- Dynamic rows inserted by JS -->
+                </div>
+
+                <button class="btn-add" onclick="addSoftware()">+ <span data-i18n="add_software">Ajouter un logiciel</span></button>
+
+                <div class="section-total" id="softwareTotalRow" style="display:none;">
+                    <span data-i18n="software_hourly_cost">Coût horaire logiciels</span>
+                    <span id="softwareHourlyCost">0.00€/h</span>
+                </div>
+            </div>
+
+            <!-- ÉLECTRICITÉ -->
+            <div class="card">
+                <div class="card-title"><span class="icon">⚡</span> <span data-i18n="electricity">Électricité</span></div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="kwh_cost">Coût du kWh (€)</label>
+                        <input type="number" class="form-input" id="kwhCost" value="0.35" step="0.0001">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="machine_wattage">Puissance machine (W)</label>
+                        <input type="number" class="form-input" id="machineWattage" value="135" min="0">
+                        <p class="form-hint" data-i18n="wattage_hint">Consommation moyenne de votre machine</p>
+                    </div>
+                </div>
+                <!-- Expert : consommation réelle (volet intégré) -->
+                <div class="expert-only" style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label"><span data-i18n="real_kwh">Consommation relevée (kWh)</span> <span class="expert-badge">Expert</span></label>
+                        <input type="number" class="form-input" id="realConsumption" value="" min="0" step="any" placeholder="0" style="max-width: 200px;">
+                        <p class="form-hint" data-i18n="real_kwh_hint">Si renseigné, prioritaire sur l'estimation par watts</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN D'ŒUVRE -->
+            <div class="card">
+                <div class="card-title"><span class="icon">💰</span> <span data-i18n="labor">Main d'œuvre</span></div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="hourly_rate">Taux horaire (€/h)</label>
+                    <input type="number" class="form-input" id="hourlyRate" value="25" style="max-width: 200px;">
+                    <p class="form-hint" data-i18n="hourly_rate_hint">Votre coût horaire souhaité</p>
+                </div>
+            </div>
+
+            <!-- EXPERT : Détail amortissement -->
+            <div class="card expert-only">
+                <div class="card-title">
+                    <span class="icon">📊</span>
+                    <span data-i18n="amortization_detail">Détail amortissement</span>
+                    <span class="expert-badge">Expert</span>
+                </div>
+                <p class="text-muted">[Expert : détail amortissement par machine, frais récurrents — à développer]</p>
+            </div>
+
+            <!-- RÉSUMÉ : COÛT HORAIRE STRUCTURE (toujours en dernier) -->
+            <div class="summary-box mt-16" id="globalHourlyBox">
+                <div class="summary-label" data-i18n="global_hourly_label">À titre indicatif — Coût horaire de votre structure</div>
+                <div class="summary-value" id="globalHourlyValue">25.00€/h</div>
+                <div class="summary-detail" data-i18n="global_hourly_detail">Prenant en compte les éléments ci-dessus (salaire + machines + logiciels)</div>
+            </div>
+        </div>
+
+        <!-- ===== ÉTAPE 5 : PROTOTYPES & ERREURS ===== -->
+        <div class="step-panel" data-step="5">
+            <h2 class="step-title" data-i18n="step5_title">Prototypes & Erreurs</h2>
+            <p class="step-subtitle" data-i18n="step5_subtitle">Intégrez vos coûts d'apprentissage</p>
+
+            <!-- PROTOTYPES -->
+            <div class="card">
+                <div class="card-title"><span class="icon">🧪</span> <span data-i18n="prototypes">Prototypes</span></div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="prototype_count">Nombre de prototypes</label>
+                        <input type="number" class="form-input" id="prototypeCount" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="prototype_surcharge">Majoration matière (%)</label>
+                        <input type="number" class="form-input" id="prototypeSurcharge" value="0" min="0">
+                        <p class="form-hint" data-i18n="surcharge_hint">Surcoût matière par prototype</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" data-i18n="billable_to_client">Facturable au client</label>
+                    <div class="toggle-yesno" id="billableToggle">
+                        <button class="active-yes" onclick="setBillable(true, this)" data-i18n="yes">Oui</button>
+                        <button onclick="setBillable(false, this)" data-i18n="no">Non</button>
+                    </div>
+                    <div class="info-box warning" id="billableInfo" style="display:none;">
+                        ⚠️ <span data-i18n="not_billable_info">Le coût des prototypes sera absorbé dans vos frais.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ERREURS INTERNES -->
+            <div class="card">
+                <div class="card-title"><span class="icon">⚠️</span> <span data-i18n="errors">Erreurs internes</span></div>
+                <p class="text-muted mb-8" data-i18n="errors_desc">Lissage du coût des productions ratées</p>
+                
+                <div class="form-row" style="align-items: end;">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="error_rate">Taux d'erreur (%)</label>
+                        <input type="number" class="form-input" id="errorRate" value="0" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="time_lost">Temps perdu par erreur</label>
+                        <div class="time-group">
+                            <div class="time-field">
+                                <label data-i18n="hours">Heures</label>
+                                <input type="number" id="errorTimeH" value="0" min="0">
+                            </div>
+                            <div class="time-field">
+                                <label data-i18n="minutes">Minutes</label>
+                                <input type="number" id="errorTimeM" value="0" min="0" max="59">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ÉTAPE 6 : MON PRIX ===== -->
+        <div class="step-panel" data-step="6">
+            <h2 class="step-title" data-i18n="step6_title">Mon Prix</h2>
+            <p class="step-subtitle" data-i18n="step6_subtitle">Résultat et ajustement de votre tarif</p>
+
+            <!-- PARAMÈTRES PRIX -->
+            <div class="card">
+                <div class="card-title"><span class="icon">🎛️</span> <span data-i18n="pricing_params">Paramètres de prix</span></div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="margin">Marge (%)</label>
+                        <input type="number" class="form-input" id="marginPercent" value="30" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="vat">TVA (%)</label>
+                        <input type="number" class="form-input" id="vatRate" value="23" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="delivery">Frais de livraison (€)</label>
+                    <input type="number" class="form-input" id="deliveryCost" value="0" min="0" style="max-width: 200px;">
+                </div>
+            </div>
+
+            <!-- BOUTON CALCULER -->
+            <button class="btn btn-calculate" onclick="calculateProject()">
+                🧮 <span data-i18n="calculate">Calculer mon prix</span>
+            </button>
+
+            <!-- RÉSULTAT PRINCIPAL (masqué tant que pas calculé) -->
+            <div class="result-big mt-16" id="resultBig" style="display: none;">
+                <div class="result-label" data-i18n="price_ttc">Prix TTC final</div>
+                <div class="result-price" id="resultPriceTTC">—</div>
+                <div class="result-unit" id="resultUnit" data-i18n="per_piece">par pièce</div>
+            </div>
+
+            <!-- DÉCOMPOSITION (masquée tant que pas calculé) -->
+            <div class="card" id="resultBreakdown" style="display: none;">
+                <div class="card-title"><span class="icon">📊</span> <span data-i18n="cost_breakdown">Décomposition du prix</span></div>
+                <div class="result-breakdown" id="breakdownContent">
+                    <!-- Generated by calculate -->
+                </div>
+
+                <div class="profit-indicator" id="profitIndicator" style="display:none;">
+                    <!-- Generated by calculate -->
+                </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="card" id="resultActions" style="display:none;">
+                <div class="action-row">
+                    <button class="btn-action" onclick="copyCalculations()">📋 <span data-i18n="copy_calculations">Copier calculs</span></button>
+                    <button class="btn-action" onclick="saveProject()">💾 <span data-i18n="save">Sauvegarder</span></button>
+                </div>
+            </div>
+
+            <!-- EXPERT : Simulation volume -->
+            <div class="card expert-only mt-16">
+                <div class="card-title">
+                    <span class="icon">📈</span>
+                    <span data-i18n="volume_simulation">Simulation volume</span>
+                    <span class="expert-badge">Expert</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="monthly_volume">Volume mensuel (projets)</label>
+                        <input type="number" class="form-input" id="monthlyVolume" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="working_hours_month">Heures de travail/mois</label>
+                        <input type="number" class="form-input" id="workingHoursMonth" value="140" min="1">
+                    </div>
+                </div>
+                <div id="volumeSimResult" class="info-box info" style="display:none;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== COPYRIGHT ===== -->
+    <div class="copyright-footer">© 2025 DOQ Design — All rights reserved</div>
+
+    <!-- ===== NAVIGATION FOOTER ===== -->
+    <div class="nav-footer">
+        <div class="nav-footer-inner">
+            <button class="btn btn-prev" id="btnPrev" onclick="prevStep()">
+                ← <span data-i18n="previous">Précédent</span>
+            </button>
+            <span class="text-muted" id="stepCount">Étape 1/6</span>
+            <button class="btn btn-next" id="btnNext" onclick="nextStep()">
+                <span data-i18n="next">Suivant</span> →
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== NOTIFICATION ===== -->
+    <div class="notification" id="notification"></div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        /* ===== MODULE : TRADUCTIONS ===== */
+
+        const TRANSLATIONS = {
+            fr: {
+                // App
+                app_title: "Calculateur de Prix Pro",
+
+                // Navigation
+                step1_title: "Mon Projet",
+                step1_subtitle: "Identifiez votre produit ou prestation",
+                step2_title: "Matières & Composants",
+                step2_subtitle: "Ce qui entre physiquement dans votre produit",
+                step3_title: "Temps de production",
+                step3_subtitle: "Combien de temps pour produire ce projet",
+                step4_title: "Mon Business",
+                step4_subtitle: "Vos coûts d'exploitation — à remplir une fois",
+                step5_title: "Prototypes & Erreurs",
+                step5_subtitle: "Intégrez vos coûts d'apprentissage",
+                step6_title: "Mon Prix",
+                step6_subtitle: "Résultat et ajustement de votre tarif",
+
+                // Stepper labels
+                step1_short: "Projet",
+                step2_short: "Matières",
+                step3_short: "Temps",
+                step4_short: "Business",
+                step5_short: "Proto/Erreurs",
+                step6_short: "Mon Prix",
+
+                // Étape 1
+                project_info: "Informations du projet",
+                project_name: "Nom du projet",
+                project_number: "Numéro",
+                category: "Catégorie",
+                production_type: "Type de production",
+                single_piece: "Pièce unique",
+                single_piece_desc: "Sur mesure",
+                series: "Série",
+                series_desc: "Plusieurs exemplaires",
+                service: "Service",
+                service_desc: "Temps & expertise",
+                how_many_pieces: "Combien de pièces dans cette série ?",
+                series_hint: "💡 Les coûts de conception et prototypage seront automatiquement répartis sur chaque pièce.",
+
+                // Étape 2
+                raw_materials: "Matières premières",
+                components: "Composants & Fournitures",
+                type: "Type",
+                quantity_used: "Quantité utilisée",
+                unit_price: "Prix unitaire",
+                total: "Total",
+                add_material: "+ Ajouter une matière",
+                add_component: "+ Ajouter un composant",
+                component_name: "Nom",
+                cost: "Coût (€)",
+                labor_time: "Temps (min)",
+
+                // Étape 3
+                machine_time: "Temps machine / équipement",
+                human_time: "Temps humain",
+                printing: "Production",
+                calibration: "Mise en route",
+                design: "Conception / Design",
+                preparation: "Préparation",
+                supervision: "Surveillance",
+                post_processing: "Post-traitement / Finition",
+                assembly: "Assemblage",
+                hours: "Heures",
+                minutes: "Minutes",
+                time_templates: "Templates de temps",
+
+                // Étape 4
+                my_business: "Mon Business",
+                equipment: "Équipement",
+                purchase_price: "Prix d'achat (€)",
+                lifespan_years: "Durée de vie (ans)",
+                usage_hours_year: "Heures d'utilisation/an",
+                maintenance_year: "Maintenance/an (€)",
+                software: "Logiciels",
+                annual_cost: "Coût annuel (€)",
+                electricity: "Électricité",
+                kwh_cost: "Coût du kWh (€)",
+                consumption_kwh: "Consommation (kWh)",
+                hourly_rate: "Taux horaire (€/h)",
+                hourly_rate_hint: "Votre coût horaire souhaité",
+                labor: "Main d'œuvre",
+                amortization_detail: "Détail amortissement",
+                equipment_amort_title: "Équipement — Amortissement",
+                equipment_hourly_cost: "Amortissement horaire équipement",
+                real_consumption: "Consommation réelle",
+                real_kwh: "Consommation relevée (kWh)",
+                real_kwh_hint: "Si renseigné, prioritaire sur l'estimation par watts",
+
+                // Étape 5
+                prototypes: "Prototypes",
+                prototype_count: "Nombre de prototypes",
+                prototype_surcharge: "Majoration (%)",
+                billable_to_client: "Facturable au client",
+                yes: "Oui",
+                no: "Non",
+                errors: "Erreurs internes",
+                error_rate: "Taux d'erreur (%)",
+                time_lost: "Temps perdu par erreur",
+
+                // Étape 6
+                calculate: "Calculer mon prix",
+                cost_breakdown: "Décomposition du prix",
+                materials_cost: "Matières",
+                components_cost: "Composants",
+                electricity_cost: "Électricité",
+                equipment_amortization: "Amortissement équipement",
+                labor_cost: "Main d'œuvre",
+                software_cost: "Logiciels",
+                prototype_error_cost: "Prototypes & erreurs",
+                cost_price_ht: "Coût de revient HT",
+                margin: "Marge",
+                price_ht: "Prix HT",
+                delivery: "Livraison",
+                vat: "TVA",
+                price_ttc: "Prix TTC final",
+                profit_per_piece: "Vous gagnez {amount} par pièce",
+                volume_simulation: "Simulation volume",
+
+                // Actions
+                save: "Sauvegarder",
+                load: "Charger",
+                previous: "Précédent",
+                next: "Suivant",
+                copy_calculations: "Copier calculs",
+                export_report: "Exporter rapport",
+                step_of: "Étape {current}/{total}",
+
+                // Mode expert
+                expert_mode: "Mode expert",
+                mode_normal: "Normal",
+                mode_expert: "Expert",
+                database: "Base de données",
+                import_export: "Import / Export",
+                counter_management: "Gestion compteur",
+                detailed_formulas: "Formules détaillées",
+
+                // Matières - modes
+                mode_direct: "Quantité",
+                mode_container: "Contenant",
+                material_name: "Nom",
+                material_quantity: "Quantité",
+                material_unit: "Unité",
+                material_unit_price: "Prix/unité",
+                container_price: "Prix contenant",
+                container_uses: "Nb projets/contenant",
+                cost_per_use: "Coût/utilisation",
+                total_materials: "Total matières",
+                total_components: "Total composants",
+                material_name_placeholder: "Ex: PLA Blanc, Cuir, Cirage...",
+                component_name_placeholder: "Ex: Ruban LED, Vis M3, Peinture...",
+                project_name_placeholder: "Ex: Lithophane client Dupont",
+
+                // Unités
+                unit_g: "g",
+                unit_kg: "kg",
+                unit_ml: "ml",
+                unit_l: "L",
+                unit_m: "m",
+                unit_cm: "cm",
+                unit_pcs: "pcs",
+
+                // Étape 3 extras
+                design_series_hint: "En mode série, ce temps sera réparti sur l'ensemble des pièces.",
+
+                // Étape 4 extras
+                add_equipment: "Ajouter un équipement",
+                equipment_name: "Nom de l'équipement",
+                equipment_name_placeholder: "Ex: Imprimante 3D, Machine à coudre...",
+                equipment_hourly_cost: "Coût horaire équipement",
+                add_software: "Ajouter un logiciel",
+                software_name: "Nom du logiciel",
+                software_name_placeholder: "Ex: Fusion 360, Photoshop...",
+                software_hourly_cost: "Coût horaire logiciels",
+                machine_wattage: "Puissance machine (W)",
+                wattage_hint: "Consommation moyenne de votre machine",
+                global_hourly_label: "À titre indicatif — Coût horaire de votre structure",
+                global_hourly_detail: "Prenant en compte les éléments ci-dessus (salaire + machines + logiciels)",
+                usage_hours_year: "Heures/an",
+
+                // Étape 5 extras
+                surcharge_hint: "Surcoût matière par prototype",
+                not_billable_info: "Le coût des prototypes sera absorbé dans vos frais.",
+                errors_desc: "Lissage du coût des productions ratées",
+
+                // Étape 6 extras
+                pricing_params: "Paramètres de prix",
+                per_piece: "par pièce",
+                monthly_volume: "Volume mensuel (projets)",
+                working_hours_month: "Heures de travail/mois",
+
+                // Save/Load
+                saved_projects: "Projets sauvegardés",
+                project_saved: "Projet sauvegardé ✓",
+                project_updated: "Projet mis à jour ✓",
+                project_loaded: "Projet chargé ✓",
+                project_deleted: "Projet supprimé",
+                no_projects: "Aucun projet sauvegardé",
+                name_required: "Donnez un nom au projet",
+                load_error: "Erreur de chargement",
+                delete: "Supprimer",
+                export_json: "Exporter projet courant",
+                import_json: "Importer un projet",
+                export_done: "Projet exporté ✓",
+                import_done: "Projet importé ✓",
+                import_error: "Fichier invalide",
+                save_disabled: "Fonctionnalité désactivée dans cette version",
+            },
+
+            en: {
+                // App
+                app_title: "Price Calculator Pro",
+
+                // Navigation
+                step1_title: "My Project",
+                step1_subtitle: "Identify your product or service",
+                step2_title: "Materials & Components",
+                step2_subtitle: "What goes physically into your product",
+                step3_title: "Production Time",
+                step3_subtitle: "How long to produce this project",
+                step4_title: "My Business",
+                step4_subtitle: "Your operating costs — fill in once",
+                step5_title: "Prototypes & Errors",
+                step5_subtitle: "Factor in your learning costs",
+                step6_title: "My Price",
+                step6_subtitle: "Result and pricing adjustments",
+
+                // Stepper labels
+                step1_short: "Project",
+                step2_short: "Materials",
+                step3_short: "Time",
+                step4_short: "Business",
+                step5_short: "Proto/Errors",
+                step6_short: "My Price",
+
+                // Étape 1
+                project_info: "Project information",
+                project_name: "Project name",
+                project_number: "Number",
+                category: "Category",
+                production_type: "Production type",
+                single_piece: "Custom piece",
+                single_piece_desc: "Made to order",
+                series: "Series",
+                series_desc: "Multiple identical units",
+                service: "Service",
+                service_desc: "Time & expertise",
+                how_many_pieces: "How many pieces in this series?",
+                series_hint: "💡 Design and prototyping costs will be automatically spread across each piece.",
+
+                // Étape 2
+                raw_materials: "Raw materials",
+                components: "Components & Supplies",
+                type: "Type",
+                quantity_used: "Quantity used",
+                unit_price: "Unit price",
+                total: "Total",
+                add_material: "+ Add material",
+                add_component: "+ Add component",
+                component_name: "Name",
+                cost: "Cost (€)",
+                labor_time: "Time (min)",
+
+                // Étape 3
+                machine_time: "Machine / equipment time",
+                human_time: "Human time",
+                printing: "Production",
+                calibration: "Setup",
+                design: "Design",
+                preparation: "Preparation",
+                supervision: "Supervision",
+                post_processing: "Post-processing / Finishing",
+                assembly: "Assembly",
+                hours: "Hours",
+                minutes: "Minutes",
+                time_templates: "Time templates",
+
+                // Étape 4
+                my_business: "My Business",
+                equipment: "Equipment",
+                purchase_price: "Purchase price (€)",
+                lifespan_years: "Lifespan (years)",
+                usage_hours_year: "Usage hours/year",
+                maintenance_year: "Maintenance/year (€)",
+                software: "Software",
+                annual_cost: "Annual cost (€)",
+                electricity: "Electricity",
+                kwh_cost: "Cost per kWh (€)",
+                consumption_kwh: "Consumption (kWh)",
+                hourly_rate: "Hourly rate (€/h)",
+                hourly_rate_hint: "Your desired hourly rate",
+                labor: "Labour",
+                amortization_detail: "Amortization detail",
+                equipment_amort_title: "Equipment — Amortization",
+                equipment_hourly_cost: "Equipment amortization/hour",
+                real_consumption: "Real consumption",
+                real_kwh: "Measured consumption (kWh)",
+                real_kwh_hint: "If filled, overrides the wattage estimate",
+
+                // Étape 5
+                prototypes: "Prototypes",
+                prototype_count: "Number of prototypes",
+                prototype_surcharge: "Surcharge (%)",
+                billable_to_client: "Billable to client",
+                yes: "Yes",
+                no: "No",
+                errors: "Internal errors",
+                error_rate: "Error rate (%)",
+                time_lost: "Time lost per error",
+
+                // Étape 6
+                calculate: "Calculate my price",
+                cost_breakdown: "Price breakdown",
+                materials_cost: "Materials",
+                components_cost: "Components",
+                electricity_cost: "Electricity",
+                equipment_amortization: "Equipment amortization",
+                labor_cost: "Labour",
+                software_cost: "Software",
+                prototype_error_cost: "Prototypes & errors",
+                cost_price_ht: "Cost price (excl. VAT)",
+                margin: "Margin",
+                price_ht: "Price (excl. VAT)",
+                delivery: "Delivery",
+                vat: "VAT",
+                price_ttc: "Final price (incl. VAT)",
+                profit_per_piece: "You earn {amount} per piece",
+                volume_simulation: "Volume simulation",
+
+                // Actions
+                save: "Save",
+                load: "Load",
+                previous: "Previous",
+                next: "Next",
+                copy_calculations: "Copy calculations",
+                export_report: "Export report",
+                step_of: "Step {current}/{total}",
+
+                // Mode expert
+                expert_mode: "Expert mode",
+                mode_normal: "Normal",
+                mode_expert: "Expert",
+                database: "Database",
+                import_export: "Import / Export",
+                counter_management: "Counter management",
+                detailed_formulas: "Detailed formulas",
+
+                // Materials - modes
+                mode_direct: "Quantity",
+                mode_container: "Container",
+                material_name: "Name",
+                material_quantity: "Quantity",
+                material_unit: "Unit",
+                material_unit_price: "Price/unit",
+                container_price: "Container price",
+                container_uses: "Projects per container",
+                cost_per_use: "Cost/use",
+                total_materials: "Total materials",
+                total_components: "Total components",
+                material_name_placeholder: "E.g.: PLA White, Leather, Polish...",
+                component_name_placeholder: "E.g.: LED strip, M3 screw, Paint...",
+                project_name_placeholder: "E.g.: Lithophane client Smith",
+
+                // Units
+                unit_g: "g",
+                unit_kg: "kg",
+                unit_ml: "ml",
+                unit_l: "L",
+                unit_m: "m",
+                unit_cm: "cm",
+                unit_pcs: "pcs",
+
+                // Step 3 extras
+                design_series_hint: "In series mode, this time will be spread across all pieces.",
+
+                // Step 4 extras
+                add_equipment: "Add equipment",
+                equipment_name: "Equipment name",
+                equipment_name_placeholder: "E.g.: 3D Printer, Sewing machine...",
+                equipment_hourly_cost: "Equipment hourly cost",
+                add_software: "Add software",
+                software_name: "Software name",
+                software_name_placeholder: "E.g.: Fusion 360, Photoshop...",
+                software_hourly_cost: "Software hourly cost",
+                machine_wattage: "Machine power (W)",
+                wattage_hint: "Average consumption of your machine",
+                global_hourly_label: "For reference — Your structure hourly cost",
+                global_hourly_detail: "Taking into account the above (salary + machines + software)",
+                usage_hours_year: "Hours/year",
+
+                // Step 5 extras
+                surcharge_hint: "Material surcharge per prototype",
+                not_billable_info: "Prototype costs will be absorbed in your expenses.",
+                errors_desc: "Smoothing the cost of failed productions",
+
+                // Step 6 extras
+                pricing_params: "Pricing parameters",
+                per_piece: "per piece",
+                monthly_volume: "Monthly volume (projects)",
+                working_hours_month: "Working hours/month",
+
+                // Save/Load
+                saved_projects: "Saved projects",
+                project_saved: "Project saved ✓",
+                project_updated: "Project updated ✓",
+                project_loaded: "Project loaded ✓",
+                project_deleted: "Project deleted",
+                no_projects: "No saved projects",
+                name_required: "Give your project a name",
+                load_error: "Loading error",
+                delete: "Delete",
+                export_json: "Export current project",
+                import_json: "Import a project",
+                export_done: "Project exported ✓",
+                import_done: "Project imported ✓",
+                import_error: "Invalid file",
+                save_disabled: "Feature disabled in this version",
+            }
+        };
+
+        /* ===== MODULE : DONNÉES & CONFIG ===== */
+
+        let currentLanguage = localStorage.getItem('calcpro_language') || 'fr';
+        let currentStep = 1;
+        let currentProductionType = 'unique'; // 'unique', 'series', 'service'
+        let expertMode = false;
+
+        // Step definitions per production type
+        const STEPS = {
+            unique: [
+                { num: 1, labelKey: 'step1_short' },
+                { num: 2, labelKey: 'step2_short' },
+                { num: 3, labelKey: 'step3_short' },
+                { num: 4, labelKey: 'step4_short' },
+                { num: 5, labelKey: 'step5_short' },
+                { num: 6, labelKey: 'step6_short' }
+            ],
+            series: [
+                { num: 1, labelKey: 'step1_short' },
+                { num: 2, labelKey: 'step2_short' },
+                { num: 3, labelKey: 'step3_short' },
+                { num: 4, labelKey: 'step4_short' },
+                { num: 5, labelKey: 'step5_short' },
+                { num: 6, labelKey: 'step6_short' }
+            ],
+            service: [
+                { num: 1, labelKey: 'step1_short' },
+                { num: 3, labelKey: 'step3_short' },
+                { num: 4, labelKey: 'step4_short' },
+                { num: 6, labelKey: 'step6_short' }
+            ]
+        };
+
+        /* ===== MODULE : TRADUCTION (i18n) ===== */
+
+        function t(key) {
+            return (TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage][key]) 
+                || (TRANSLATIONS['fr'] && TRANSLATIONS['fr'][key]) 
+                || key;
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('calcpro_language', lang);
+
+            // Update lang buttons
+            document.getElementById('btnLangFr').classList.toggle('active', lang === 'fr');
+            document.getElementById('btnLangEn').classList.toggle('active', lang === 'en');
+
+            // Translate all data-i18n elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const translation = t(key);
+                if (translation !== key) {
+                    el.textContent = translation;
+                }
+            });
+
+            // Translate placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                const translation = t(key);
+                if (translation !== key) {
+                    el.placeholder = translation;
+                }
+            });
+
+            // Re-render dynamic elements
+            renderStepper();
+            updateStepCount();
+            updateModeBadge();
+            updateExpertIndicator();
+
+            // Re-render dynamic lists (labels generated by JS)
+            if (typeof renderMaterials === 'function') renderMaterials();
+            if (typeof renderComponents === 'function') renderComponents();
+            if (typeof renderEquipments === 'function') renderEquipments();
+            if (typeof renderSoftwares === 'function') renderSoftwares();
+
+            document.documentElement.lang = lang;
+        }
+
+        /* ===== MODULE : NAVIGATION ===== */
+
+        function getSteps() {
+            return STEPS[currentProductionType] || STEPS.unique;
+        }
+
+        function renderStepper() {
+            const stepper = document.getElementById('stepper');
+            const steps = getSteps();
+            let html = '';
+
+            steps.forEach((step, i) => {
+                const state = step.num < currentStep ? 'done' : step.num === currentStep ? 'active' : '';
+                const label = t(step.labelKey);
+                html += `
+                    <div class="step-indicator ${state}" onclick="goToStep(${step.num})">
+                        <div class="step-circle">${step.num < currentStep ? '✓' : (i + 1)}</div>
+                        <div class="step-label">${label}</div>
+                    </div>
+                `;
+                if (i < steps.length - 1) {
+                    html += `<div class="step-line ${step.num < currentStep ? 'done' : ''}"></div>`;
+                }
+            });
+
+            stepper.innerHTML = html;
+        }
+
+        function showStep(stepNum) {
+            currentStep = stepNum;
+
+            // Hide all panels, show target
+            document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+            const panel = document.querySelector(`.step-panel[data-step="${stepNum}"]`);
+            if (panel) panel.classList.add('active');
+
+            // Handle service mode visibility
+            updateServiceModeVisibility();
+
+            // Update stepper + footer
+            renderStepper();
+            updateNavFooter();
+            updateStepCount();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextStep() {
+            const steps = getSteps();
+            const currentIndex = steps.findIndex(s => s.num === currentStep);
+            if (currentIndex < steps.length - 1) {
+                showStep(steps[currentIndex + 1].num);
+            } else {
+                // Last step — trigger calculate
+                // calculateProject(); // Will be connected in 1C
+            }
+        }
+
+        function prevStep() {
+            const steps = getSteps();
+            const currentIndex = steps.findIndex(s => s.num === currentStep);
+            if (currentIndex > 0) {
+                showStep(steps[currentIndex - 1].num);
+            }
+        }
+
+        function goToStep(stepNum) {
+            const steps = getSteps();
+            // Verify step exists in current mode
+            if (steps.find(s => s.num === stepNum)) {
+                showStep(stepNum);
+            }
+        }
+
+        function updateNavFooter() {
+            const steps = getSteps();
+            const maxStep = steps[steps.length - 1].num;
+            const isFirst = currentStep === steps[0].num;
+            const isLast = currentStep === maxStep;
+
+            document.getElementById('btnPrev').style.visibility = isFirst ? 'hidden' : 'visible';
+            
+            const btnNext = document.getElementById('btnNext');
+            if (isLast) {
+                btnNext.innerHTML = `🧮 <span data-i18n="calculate">${t('calculate')}</span>`;
+            } else {
+                btnNext.innerHTML = `<span data-i18n="next">${t('next')}</span> →`;
+            }
+        }
+
+        function updateStepCount() {
+            const steps = getSteps();
+            const currentIndex = steps.findIndex(s => s.num === currentStep);
+            const text = t('step_of')
+                .replace('{current}', currentIndex + 1)
+                .replace('{total}', steps.length);
+            document.getElementById('stepCount').textContent = text;
+        }
+
+        /* ===== MODULE : PRODUCTION TYPE ===== */
+
+        function selectProductionType(type, element) {
+            currentProductionType = type;
+
+            // Update toggle visuals
+            document.querySelectorAll('#productionTypeChoice .toggle-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            if (element) element.classList.add('selected');
+
+            // Show/hide series panel
+            const seriesPanel = document.getElementById('seriesPanel');
+            seriesPanel.classList.toggle('visible', type === 'series');
+
+            // Update mode badge
+            updateModeBadge();
+
+            // Re-render stepper for new step set
+            // If current step doesn't exist in new mode, go to step 1
+            const steps = getSteps();
+            if (!steps.find(s => s.num === currentStep)) {
+                currentStep = 1;
+            }
+            renderStepper();
+            updateNavFooter();
+            updateStepCount();
+        }
+
+        function updateModeBadge() {
+            const icons = { unique: '🎨', series: '📦', service: '🔧' };
+            const keys = { unique: 'single_piece', series: 'series', service: 'service' };
+            
+            document.querySelector('#modeBadge .mode-icon').textContent = icons[currentProductionType] || '🎨';
+            const textEl = document.getElementById('modeBadgeText');
+            textEl.setAttribute('data-i18n', keys[currentProductionType]);
+            textEl.textContent = t(keys[currentProductionType]);
+        }
+
+        /* ===== MODULE : SERVICE MODE VISIBILITY ===== */
+
+        function updateServiceModeVisibility() {
+            const isService = currentProductionType === 'service';
+            const isSeries = currentProductionType === 'series';
+            
+            // Hide machine time card in service mode
+            const machineTimeCard = document.getElementById('cardMachineTime');
+            if (machineTimeCard) {
+                machineTimeCard.style.display = isService ? 'none' : '';
+            }
+
+            // Hide supervision in service mode
+            const supervGroup = document.getElementById('supervisionGroup');
+            if (supervGroup) {
+                supervGroup.style.display = isService ? 'none' : '';
+            }
+
+            // Show series hint for design time
+            const seriesHint = document.getElementById('designSeriesHint');
+            if (seriesHint) {
+                seriesHint.style.display = isSeries ? 'block' : 'none';
+            }
+        }
+
+        /* ===== MODULE : EXPERT MODE ===== */
+
+        function toggleExpertMode() {
+            expertMode = document.getElementById('expertToggle').checked;
+            document.body.classList.toggle('expert-mode', expertMode);
+            updateExpertIndicator();
+            // Project number: editable in expert, readonly in normal
+            const numField = document.getElementById('projectNumber');
+            if (numField) {
+                numField.readOnly = !expertMode;
+                numField.style.background = expertMode ? 'var(--card)' : 'var(--bg)';
+            }
+        }
+
+        function updateExpertIndicator() {
+            const indicator = document.getElementById('expertIndicator');
+            if (expertMode) {
+                indicator.className = 'expert-mode-indicator expert';
+                indicator.setAttribute('data-i18n', 'mode_expert');
+                indicator.textContent = t('mode_expert');
+            } else {
+                indicator.className = 'expert-mode-indicator normal';
+                indicator.setAttribute('data-i18n', 'mode_normal');
+                indicator.textContent = t('mode_normal');
+            }
+        }
+
+        /* ===== MODULE : NOTIFICATIONS ===== */
+
+        function showNotification(message, type = 'info') {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.className = `notification ${type} show`;
+            setTimeout(() => { notif.classList.remove('show'); }, 3000);
+        }
+
+        /* ===== MODULE : MATIÈRES (listes dynamiques) ===== */
+
+        let materials = [];
+        let components = [];
+        let materialIdCounter = 0;
+        let componentIdCounter = 0;
+
+        function addMaterial(data) {
+            materialIdCounter++;
+            const defaults = {
+                id: materialIdCounter,
+                name: '',
+                mode: 'direct', // 'direct' or 'container'
+                // Direct mode
+                quantity: 0,
+                unit: 'g',
+                unitPrice: 0, // price per kg, L, m, etc.
+                // Container mode
+                containerPrice: 0,
+                containerUses: 1
+            };
+            materials.push(data ? Object.assign(defaults, data, { id: materialIdCounter }) : defaults);
+            renderMaterials();
+        }
+
+        function removeMaterial(id) {
+            materials = materials.filter(m => m.id !== id);
+            renderMaterials();
+        }
+
+        function updateMaterial(id, field, value) {
+            const mat = materials.find(m => m.id === id);
+            if (!mat) return;
+
+            if (field === 'quantity' || field === 'unitPrice' || field === 'containerPrice' || field === 'containerUses') {
+                mat[field] = parseFloat(value) || 0;
+            } else if (field === 'unit') {
+                mat[field] = value;
+                // Unit change affects the price label — need full re-render
+                renderMaterials();
+                return;
+            } else {
+                mat[field] = value;
+            }
+            
+            // Update only the totals, NOT the full HTML
+            updateMaterialTotals();
+        }
+
+        function setMaterialMode(id, mode) {
+            const mat = materials.find(m => m.id === id);
+            if (!mat) return;
+            mat.mode = mode;
+            renderMaterials();
+        }
+
+        function getMaterialCost(mat) {
+            if (mat.mode === 'container') {
+                return mat.containerUses > 0 ? mat.containerPrice / mat.containerUses : 0;
+            }
+            // Direct mode: convert to base unit price
+            // unitPrice is per kg/L/m, quantity is in g/ml/cm/pcs
+            const conversionFactors = {
+                'g': 1000,    // price per kg, quantity in g
+                'kg': 1,
+                'ml': 1000,   // price per L, quantity in ml
+                'l': 1,
+                'm': 1,
+                'cm': 100,    // price per m, quantity in cm
+                'pcs': 1      // price per piece
+            };
+            const factor = conversionFactors[mat.unit] || 1;
+            return (mat.quantity / factor) * mat.unitPrice;
+        }
+
+        function getUnitPriceLabel(unit) {
+            const labels = {
+                'g': '€/kg', 'kg': '€/kg',
+                'ml': '€/L', 'l': '€/L',
+                'm': '€/m', 'cm': '€/m',
+                'pcs': '€/pcs'
+            };
+            return labels[unit] || '€';
+        }
+
+        function renderMaterials() {
+            const container = document.getElementById('materialsList');
+            const totalRow = document.getElementById('materialsTotalRow');
+            
+            if (materials.length === 0) {
+                container.innerHTML = '';
+                totalRow.style.display = 'none';
+                return;
+            }
+
+            let html = '';
+            let grandTotal = 0;
+
+            materials.forEach((mat, index) => {
+                const cost = getMaterialCost(mat);
+                grandTotal += cost;
+                const num = index + 1;
+
+                html += `<div class="item-card" data-material-id="${mat.id}">`;
+                html += `<div class="item-card-header">`;
+                html += `<span class="item-number">#${num}</span>`;
+                html += `<div class="mode-toggle-mini">`;
+                html += `<button class="${mat.mode === 'direct' ? 'active' : ''}" onclick="setMaterialMode(${mat.id}, 'direct')">${t('mode_direct')}</button>`;
+                html += `<button class="${mat.mode === 'container' ? 'active' : ''}" onclick="setMaterialMode(${mat.id}, 'container')">${t('mode_container')}</button>`;
+                html += `</div>`;
+                html += `<button class="btn-remove" onclick="removeMaterial(${mat.id})">✕</button>`;
+                html += `</div>`;
+
+                // Name field
+                html += `<div class="item-card-name">`;
+                html += `<input type="text" value="${escapeHtml(mat.name)}" placeholder="${t('material_name_placeholder')}" oninput="updateMaterial(${mat.id}, 'name', this.value)">`;
+                html += `</div>`;
+
+                if (mat.mode === 'direct') {
+                    html += `<div class="item-card-fields cols-3">`;
+                    html += `<div class="field-group">`;
+                    html += `<span class="field-label">${t('material_quantity')}</span>`;
+                    html += `<div style="display:flex;gap:4px;">`;
+                    html += `<input type="number" value="${mat.quantity || ''}" min="0" step="any" placeholder="0" oninput="updateMaterial(${mat.id}, 'quantity', this.value)" style="flex:1;">`;
+                    html += `<select style="width:60px;padding:8px 4px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;" onchange="updateMaterial(${mat.id}, 'unit', this.value)">`;
+                    ['g','kg','ml','l','m','cm','pcs'].forEach(u => {
+                        html += `<option value="${u}" ${mat.unit === u ? 'selected' : ''}>${t('unit_'+u)}</option>`;
+                    });
+                    html += `</select></div></div>`;
+                    html += `<div class="field-group">`;
+                    html += `<span class="field-label">${t('material_unit_price')} (${getUnitPriceLabel(mat.unit)})</span>`;
+                    html += `<input type="number" value="${mat.unitPrice || ''}" min="0" step="any" placeholder="0" oninput="updateMaterial(${mat.id}, 'unitPrice', this.value)">`;
+                    html += `</div>`;
+                    html += `<div class="field-group">`;
+                    html += `<span class="field-label">${t('total')}</span>`;
+                    html += `<div class="item-card-total" data-total-id="mat-${mat.id}" style="padding:8px 0;">${cost.toFixed(2)}€</div>`;
+                    html += `</div>`;
+                    html += `</div>`;
+                } else {
+                    // Container mode
+                    html += `<div class="item-card-fields cols-3">`;
+                    html += `<div class="field-group">`;
+                    html += `<span class="field-label">${t('container_price')} (€)</span>`;
+                    html += `<input type="number" value="${mat.containerPrice || ''}" min="0" step="any" placeholder="0" oninput="updateMaterial(${mat.id}, 'containerPrice', this.value)">`;
+                    html += `</div>`;
+                    html += `<div class="field-group">`;
+                    html += `<span class="field-label">${t('container_uses')}</span>`;
+                    html += `<input type="number" value="${mat.containerUses || ''}" min="1" step="1" placeholder="1" oninput="updateMaterial(${mat.id}, 'containerUses', this.value)">`;
+                    html += `</div>`;
+                    html += `<div class="field-group">`;
+                    html += `<span class="field-label">${t('cost_per_use')}</span>`;
+                    html += `<div class="item-card-total" data-total-id="mat-${mat.id}" style="padding:8px 0;">${cost.toFixed(2)}€</div>`;
+                    html += `</div>`;
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+            totalRow.style.display = 'flex';
+            document.getElementById('materialsTotal').textContent = grandTotal.toFixed(2) + '€';
+        }
+
+        function updateMaterialTotals() {
+            let grandTotal = 0;
+            materials.forEach(mat => {
+                const cost = getMaterialCost(mat);
+                grandTotal += cost;
+                const el = document.querySelector(`[data-total-id="mat-${mat.id}"]`);
+                if (el) el.textContent = cost.toFixed(2) + '€';
+            });
+            const totalEl = document.getElementById('materialsTotal');
+            if (totalEl) totalEl.textContent = grandTotal.toFixed(2) + '€';
+            const totalRow = document.getElementById('materialsTotalRow');
+            if (totalRow) totalRow.style.display = materials.length > 0 ? 'flex' : 'none';
+        }
+
+        /* ===== MODULE : COMPOSANTS (listes dynamiques) ===== */
+
+        function addComponent(data) {
+            componentIdCounter++;
+            const defaults = {
+                id: componentIdCounter,
+                name: '',
+                cost: 0,
+                laborMinutes: 0
+            };
+            components.push(data ? Object.assign(defaults, data, { id: componentIdCounter }) : defaults);
+            renderComponents();
+        }
+
+        function removeComponent(id) {
+            components = components.filter(c => c.id !== id);
+            renderComponents();
+        }
+
+        function updateComponent(id, field, value) {
+            const comp = components.find(c => c.id === id);
+            if (!comp) return;
+
+            if (field === 'cost' || field === 'laborMinutes') {
+                comp[field] = parseFloat(value) || 0;
+            } else {
+                comp[field] = value;
+            }
+
+            updateComponentTotals();
+        }
+
+        function renderComponents() {
+            const container = document.getElementById('componentsList');
+            const totalRow = document.getElementById('componentsTotalRow');
+
+            if (components.length === 0) {
+                container.innerHTML = '';
+                totalRow.style.display = 'none';
+                return;
+            }
+
+            let html = '';
+            let grandTotal = 0;
+
+            components.forEach((comp, index) => {
+                grandTotal += comp.cost;
+                const num = index + 1;
+
+                html += `<div class="item-card" data-component-id="${comp.id}">`;
+                html += `<div class="item-card-header">`;
+                html += `<span class="item-number">#${num}</span>`;
+                html += `<button class="btn-remove" onclick="removeComponent(${comp.id})">✕</button>`;
+                html += `</div>`;
+
+                // Name
+                html += `<div class="item-card-name">`;
+                html += `<input type="text" value="${escapeHtml(comp.name)}" placeholder="${t('component_name_placeholder')}" oninput="updateComponent(${comp.id}, 'name', this.value)">`;
+                html += `</div>`;
+
+                // Cost + Labor time
+                html += `<div class="item-card-fields">`;
+                html += `<div class="field-group">`;
+                html += `<span class="field-label">${t('cost')} (€)</span>`;
+                html += `<input type="number" value="${comp.cost || ''}" min="0" step="any" placeholder="0" oninput="updateComponent(${comp.id}, 'cost', this.value)">`;
+                html += `</div>`;
+                html += `<div class="field-group">`;
+                html += `<span class="field-label">${t('labor_time')} (min)</span>`;
+                html += `<input type="number" value="${comp.laborMinutes || ''}" min="0" step="1" placeholder="0" oninput="updateComponent(${comp.id}, 'laborMinutes', this.value)">`;
+                html += `</div>`;
+                html += `</div>`;
+
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+            totalRow.style.display = 'flex';
+            document.getElementById('componentsTotal').textContent = grandTotal.toFixed(2) + '€';
+        }
+
+        function updateComponentTotals() {
+            let grandTotal = 0;
+            components.forEach(comp => { grandTotal += comp.cost; });
+            const totalEl = document.getElementById('componentsTotal');
+            if (totalEl) totalEl.textContent = grandTotal.toFixed(2) + '€';
+            const totalRow = document.getElementById('componentsTotalRow');
+            if (totalRow) totalRow.style.display = components.length > 0 ? 'flex' : 'none';
+        }
+
+        /* ===== MODULE : ÉQUIPEMENT (liste dynamique étape 4) ===== */
+
+        let equipments = [];
+        let equipmentIdCounter = 0;
+
+        function addEquipment(data) {
+            equipmentIdCounter++;
+            const defaults = {
+                id: equipmentIdCounter,
+                name: '',
+                purchasePrice: 0,
+                lifespanYears: 5,
+                usageHoursYear: 1000,
+                maintenanceYear: 0
+            };
+            equipments.push(data ? Object.assign(defaults, data, { id: equipmentIdCounter }) : defaults);
+            renderEquipments();
+        }
+
+        function removeEquipment(id) {
+            equipments = equipments.filter(e => e.id !== id);
+            renderEquipments();
+        }
+
+        function updateEquipment(id, field, value) {
+            const eq = equipments.find(e => e.id === id);
+            if (!eq) return;
+            if (field === 'name') { eq[field] = value; }
+            else { eq[field] = parseFloat(value) || 0; }
+            updateEquipmentTotals();
+        }
+
+        function getEquipmentHourlyCost(eq) {
+            if (eq.lifespanYears <= 0 || eq.usageHoursYear <= 0) return 0;
+            const annualAmort = eq.purchasePrice / eq.lifespanYears;
+            return (annualAmort + eq.maintenanceYear) / eq.usageHoursYear;
+        }
+
+        function renderEquipments() {
+            const container = document.getElementById('equipmentList');
+            const totalRow = document.getElementById('equipmentTotalRow');
+
+            if (equipments.length === 0) {
+                container.innerHTML = '';
+                totalRow.style.display = 'none';
+                updateGlobalHourly();
+                return;
+            }
+
+            let html = '';
+            let totalHourlyCost = 0;
+
+            equipments.forEach((eq, index) => {
+                const hourly = getEquipmentHourlyCost(eq);
+                totalHourlyCost += hourly;
+
+                html += `<div class="item-card">`;
+                html += `<div class="item-card-header">`;
+                html += `<span class="item-number">#${index + 1}</span>`;
+                html += `<button class="btn-remove" onclick="removeEquipment(${eq.id})">✕</button>`;
+                html += `</div>`;
+
+                html += `<div class="item-card-name">`;
+                html += `<input type="text" value="${escapeHtml(eq.name)}" placeholder="${t('equipment_name_placeholder')}" oninput="updateEquipment(${eq.id}, 'name', this.value)">`;
+                html += `</div>`;
+
+                html += `<div class="item-card-fields">`;
+                html += `<div class="field-group"><span class="field-label">${t('purchase_price')}</span>`;
+                html += `<input type="number" value="${eq.purchasePrice || ''}" min="0" step="any" placeholder="0" oninput="updateEquipment(${eq.id}, 'purchasePrice', this.value)"></div>`;
+                html += `<div class="field-group"><span class="field-label">${t('lifespan_years')}</span>`;
+                html += `<input type="number" value="${eq.lifespanYears || ''}" min="1" step="1" placeholder="5" oninput="updateEquipment(${eq.id}, 'lifespanYears', this.value)"></div>`;
+                html += `<div class="field-group"><span class="field-label">${t('usage_hours_year')}</span>`;
+                html += `<input type="number" value="${eq.usageHoursYear || ''}" min="1" step="1" placeholder="1000" oninput="updateEquipment(${eq.id}, 'usageHoursYear', this.value)"></div>`;
+                html += `<div class="field-group"><span class="field-label">${t('maintenance_year')}</span>`;
+                html += `<input type="number" value="${eq.maintenanceYear || ''}" min="0" step="any" placeholder="0" oninput="updateEquipment(${eq.id}, 'maintenanceYear', this.value)"></div>`;
+                html += `</div>`;
+
+                html += `<div class="item-card-footer">`;
+                html += `<span class="item-card-total" data-total-id="eq-${eq.id}"><span class="total-label">${t('cost')}/h:</span>${hourly.toFixed(3)}€</span>`;
+                html += `</div>`;
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+            totalRow.style.display = 'flex';
+            document.getElementById('equipmentHourlyCost').textContent = totalHourlyCost.toFixed(3) + '€/h';
+            updateGlobalHourly();
+        }
+
+        function updateEquipmentTotals() {
+            let totalHourlyCost = 0;
+            equipments.forEach(eq => {
+                const hourly = getEquipmentHourlyCost(eq);
+                totalHourlyCost += hourly;
+                const el = document.querySelector(`[data-total-id="eq-${eq.id}"]`);
+                if (el) el.innerHTML = `<span class="total-label">${t('cost')}/h:</span>${hourly.toFixed(3)}€`;
+            });
+            const totalEl = document.getElementById('equipmentHourlyCost');
+            if (totalEl) totalEl.textContent = totalHourlyCost.toFixed(3) + '€/h';
+            const totalRow = document.getElementById('equipmentTotalRow');
+            if (totalRow) totalRow.style.display = equipments.length > 0 ? 'flex' : 'none';
+            updateGlobalHourly();
+        }
+
+        /* ===== MODULE : LOGICIELS (liste dynamique étape 4) ===== */
+
+        const SOFTWARE_PRESETS = [
+            { name: 'Gratuit (Blender, GIMP, Cura...)', annualCost: 0 },
+            { name: 'Microsoft 365', annualCost: 70 },
+            { name: 'Adobe Creative Cloud', annualCost: 290 },
+            { name: 'Fusion 360', annualCost: 500 },
+            { name: 'Photoshop (seul)', annualCost: 144 },
+            { name: 'ZBrush', annualCost: 180 }
+        ];
+
+        let softwares = [];
+        let softwareIdCounter = 0;
+
+        function addSoftware(data) {
+            softwareIdCounter++;
+            const defaults = {
+                id: softwareIdCounter,
+                name: '',
+                annualCost: 0,
+                usageHoursYear: 500
+            };
+            softwares.push(data ? Object.assign(defaults, data, { id: softwareIdCounter }) : defaults);
+            renderSoftwares();
+        }
+
+        function removeSoftware(id) {
+            softwares = softwares.filter(s => s.id !== id);
+            renderSoftwares();
+        }
+
+        function updateSoftware(id, field, value) {
+            const sw = softwares.find(s => s.id === id);
+            if (!sw) return;
+            if (field === 'name') { sw[field] = value; }
+            else { sw[field] = parseFloat(value) || 0; }
+            updateSoftwareTotals();
+        }
+
+        function selectSoftwarePreset(id, presetIndex) {
+            const sw = softwares.find(s => s.id === id);
+            if (!sw) return;
+            const preset = SOFTWARE_PRESETS[presetIndex];
+            if (preset) {
+                sw.name = preset.name;
+                sw.annualCost = preset.annualCost;
+            }
+            renderSoftwares();
+        }
+
+        function getSoftwareHourlyCost(sw) {
+            if (sw.usageHoursYear <= 0) return 0;
+            return sw.annualCost / sw.usageHoursYear;
+        }
+
+        function renderSoftwares() {
+            const container = document.getElementById('softwareList');
+            const totalRow = document.getElementById('softwareTotalRow');
+
+            if (softwares.length === 0) {
+                container.innerHTML = '';
+                totalRow.style.display = 'none';
+                updateGlobalHourly();
+                return;
+            }
+
+            let html = '';
+            let totalHourlyCost = 0;
+
+            softwares.forEach((sw, index) => {
+                const hourly = getSoftwareHourlyCost(sw);
+                totalHourlyCost += hourly;
+
+                html += `<div class="item-card">`;
+                html += `<div class="item-card-header">`;
+                html += `<span class="item-number">#${index + 1}</span>`;
+                html += `<button class="btn-remove" onclick="removeSoftware(${sw.id})">✕</button>`;
+                html += `</div>`;
+
+                // Preset dropdown + custom name
+                html += `<div class="item-card-name" style="display:flex;gap:6px;">`;
+                html += `<select style="padding:8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;flex:0 0 auto;max-width:50%;" onchange="selectSoftwarePreset(${sw.id}, this.value)">`;
+                html += `<option value="">— ${t('software_name')} —</option>`;
+                SOFTWARE_PRESETS.forEach((p, i) => {
+                    html += `<option value="${i}" ${sw.name === p.name ? 'selected' : ''}>${p.name}</option>`;
+                });
+                html += `</select>`;
+                html += `<input type="text" value="${escapeHtml(sw.name)}" placeholder="${t('software_name_placeholder')}" oninput="updateSoftware(${sw.id}, 'name', this.value)" style="flex:1;">`;
+                html += `</div>`;
+
+                html += `<div class="item-card-fields">`;
+                html += `<div class="field-group"><span class="field-label">${t('annual_cost')} (€)</span>`;
+                html += `<input type="number" value="${sw.annualCost || ''}" min="0" step="any" placeholder="0" oninput="updateSoftware(${sw.id}, 'annualCost', this.value)"></div>`;
+                html += `<div class="field-group"><span class="field-label">${t('usage_hours_year')}</span>`;
+                html += `<input type="number" value="${sw.usageHoursYear || ''}" min="1" step="1" placeholder="500" oninput="updateSoftware(${sw.id}, 'usageHoursYear', this.value)"></div>`;
+                html += `</div>`;
+
+                html += `<div class="item-card-footer">`;
+                html += `<span class="item-card-total" data-total-id="sw-${sw.id}"><span class="total-label">${t('cost')}/h:</span>${hourly.toFixed(3)}€</span>`;
+                html += `</div>`;
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+            totalRow.style.display = 'flex';
+            document.getElementById('softwareHourlyCost').textContent = totalHourlyCost.toFixed(3) + '€/h';
+            updateGlobalHourly();
+        }
+
+        function updateSoftwareTotals() {
+            let totalHourlyCost = 0;
+            softwares.forEach(sw => {
+                const hourly = getSoftwareHourlyCost(sw);
+                totalHourlyCost += hourly;
+                const el = document.querySelector(`[data-total-id="sw-${sw.id}"]`);
+                if (el) el.innerHTML = `<span class="total-label">${t('cost')}/h:</span>${hourly.toFixed(3)}€`;
+            });
+            const totalEl = document.getElementById('softwareHourlyCost');
+            if (totalEl) totalEl.textContent = totalHourlyCost.toFixed(3) + '€/h';
+            const totalRow = document.getElementById('softwareTotalRow');
+            if (totalRow) totalRow.style.display = softwares.length > 0 ? 'flex' : 'none';
+            updateGlobalHourly();
+        }
+
+        /* ===== MODULE : COÛT HORAIRE GLOBAL ===== */
+
+        function updateGlobalHourly() {
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate')?.value) || 0;
+            
+            let equipHourly = 0;
+            equipments.forEach(eq => { equipHourly += getEquipmentHourlyCost(eq); });
+            
+            let softHourly = 0;
+            softwares.forEach(sw => { softHourly += getSoftwareHourlyCost(sw); });
+
+            const total = hourlyRate + equipHourly + softHourly;
+            const el = document.getElementById('globalHourlyValue');
+            if (el) el.textContent = total.toFixed(2) + '€/h';
+        }
+
+        /* ===== MODULE : BILLABLE TOGGLE (étape 5) ===== */
+
+        let prototypeBillable = true;
+
+        function setBillable(value, btn) {
+            prototypeBillable = value;
+            const wrapper = document.getElementById('billableToggle');
+            wrapper.querySelectorAll('button').forEach(b => {
+                b.className = '';
+            });
+            if (value) {
+                btn.className = 'active-yes';
+                document.getElementById('billableInfo').style.display = 'none';
+            } else {
+                btn.className = 'active-no';
+                document.getElementById('billableInfo').style.display = 'block';
+            }
+        }
+
+        /* ===== MODULE : MOTEUR DE CALCUL (migré de V0.40, adapté V1.0) ===== */
+
+        function timeToHours(h, m) {
+            return (parseFloat(h) || 0) + (parseFloat(m) || 0) / 60;
+        }
+
+        function formatTime(totalHours) {
+            const h = Math.floor(totalHours);
+            const m = Math.round((totalHours - h) * 60);
+            if (h === 0) return m + 'min';
+            if (m === 0) return h + 'h';
+            return h + 'h' + (m < 10 ? '0' : '') + m;
+        }
+
+        // ===== MODULE : SAVE / LOAD PROJET =====
+        const SAVE_ENABLED = true; // Set to true to enable save/load/import/export
+        const STORAGE_PREFIX = 'calcpro_project_';
+        const STORAGE_INDEX = 'calcpro_projects_index';
+        const STORAGE_COUNTER = 'calcpro_project_counter';
+
+        function getProjectCounter() {
+            return parseInt(localStorage.getItem(STORAGE_COUNTER) || '0');
+        }
+
+        function incrementProjectCounter() {
+            const next = getProjectCounter() + 1;
+            localStorage.setItem(STORAGE_COUNTER, next.toString());
+            return next;
+        }
+
+        function formatProjectNumber(num) {
+            const year = new Date().getFullYear();
+            return '#' + String(num).padStart(5, '0') + '-' + year;
+        }
+
+        function assignNewProjectNumber() {
+            const num = incrementProjectCounter();
+            const formatted = formatProjectNumber(num);
+            document.getElementById('projectNumber').value = formatted;
+            return formatted;
+        }
+
+        // All scalar field IDs to serialize
+        const SERIALIZABLE_FIELDS = [
+            'projectName', 'projectNumber', 'projectCategory', 'seriesQuantity',
+            'machPrintH', 'machPrintM', 'machCalibH', 'machCalibM',
+            'humanDesignH', 'humanDesignM', 'humanPrepH', 'humanPrepM',
+            'humanSupervH', 'humanSupervM', 'humanPostH', 'humanPostM',
+            'humanAssemblyH', 'humanAssemblyM',
+            'kwhCost', 'machineWattage', 'realConsumption', 'hourlyRate',
+            'prototypeCount', 'prototypeSurcharge', 'errorRate', 'errorTimeH', 'errorTimeM',
+            'marginPercent', 'vatRate', 'deliveryCost',
+            'monthlyVolume', 'workingHoursMonth'
+        ];
+
+        function serializeProject() {
+            const fields = {};
+            SERIALIZABLE_FIELDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) fields[id] = el.value;
+            });
+            return {
+                version: '1.0',
+                savedAt: new Date().toISOString(),
+                productionType: currentProductionType,
+                prototypeBillable: prototypeBillable,
+                fields: fields,
+                materials: materials.map(m => ({ name: m.name, mode: m.mode, quantity: m.quantity, unit: m.unit, unitPrice: m.unitPrice, containerPrice: m.containerPrice, containerUses: m.containerUses })),
+                components: components.map(c => ({ name: c.name, cost: c.cost, laborMinutes: c.laborMinutes })),
+                equipments: equipments.map(e => ({ name: e.name, purchasePrice: e.purchasePrice, lifespanYears: e.lifespanYears, usageHoursYear: e.usageHoursYear, maintenanceYear: e.maintenanceYear })),
+                softwares: softwares.map(s => ({ name: s.name, annualCost: s.annualCost, usageHoursYear: s.usageHoursYear }))
+            };
+        }
+
+        function restoreProject(data) {
+            if (!data || data.version !== '1.0') {
+                showNotification(t('load_error') || 'Erreur de chargement', 'error');
+                return false;
+            }
+
+            // Restore scalar fields
+            Object.keys(data.fields || {}).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = data.fields[id];
+            });
+
+            // Restore production type
+            if (data.productionType) {
+                const opt = document.querySelector(`#productionTypeChoice .toggle-option[onclick*="'${data.productionType}'"]`);
+                if (opt) selectProductionType(data.productionType, opt);
+            }
+
+            // Restore prototype billable toggle
+            if (typeof data.prototypeBillable === 'boolean') {
+                const btn = data.prototypeBillable 
+                    ? document.querySelector('#billableToggle .active-yes') || document.querySelector('#billableToggle button:first-child')
+                    : document.querySelector('#billableToggle button:last-child');
+                if (btn) setBillable(data.prototypeBillable, btn);
+            }
+
+            // Restore dynamic lists — clear then rebuild
+            materials = [];
+            materialIdCounter = 0;
+            (data.materials || []).forEach(m => addMaterial(m));
+
+            components = [];
+            componentIdCounter = 0;
+            (data.components || []).forEach(c => addComponent(c));
+
+            equipments = [];
+            equipmentIdCounter = 0;
+            (data.equipments || []).forEach(e => addEquipment(e));
+
+            softwares = [];
+            softwareIdCounter = 0;
+            (data.softwares || []).forEach(s => addSoftware(s));
+
+            return true;
+        }
+
+        function getProjectsIndex() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_INDEX) || '[]');
+            } catch(e) { return []; }
+        }
+
+        function saveProjectsIndex(index) {
+            localStorage.setItem(STORAGE_INDEX, JSON.stringify(index));
+        }
+
+        function saveProject() {
+            if (!SAVE_ENABLED) { showNotification(t('save_disabled') || 'Sauvegarde désactivée dans cette version', 'warning'); return; }
+            const name = document.getElementById('projectName')?.value?.trim();
+            if (!name) {
+                showNotification(t('name_required') || 'Donnez un nom au projet', 'warning');
+                goToStep(1);
+                document.getElementById('projectName')?.focus();
+                return;
+            }
+
+            const projectData = serializeProject();
+            const projectId = 'proj_' + Date.now();
+
+            // Check if a project with this name already exists
+            const index = getProjectsIndex();
+            const existing = index.find(p => p.name === name);
+            
+            if (existing) {
+                // Overwrite existing
+                localStorage.setItem(STORAGE_PREFIX + existing.id, JSON.stringify(projectData));
+                existing.savedAt = projectData.savedAt;
+                existing.productionType = projectData.productionType;
+                saveProjectsIndex(index);
+                showNotification(t('project_updated') || 'Projet mis à jour', 'success');
+            } else {
+                // New save — assign a project number if not yet done
+                const numField = document.getElementById('projectNumber');
+                if (numField && (!numField.value || numField.value === '#00001-2026')) {
+                    assignNewProjectNumber();
+                }
+                const projectData2 = serializeProject(); // re-serialize with updated number
+                localStorage.setItem(STORAGE_PREFIX + projectId, JSON.stringify(projectData2));
+                index.unshift({ id: projectId, name: name, savedAt: projectData2.savedAt, productionType: projectData2.productionType });
+                saveProjectsIndex(index);
+                showNotification(t('project_saved') || 'Projet sauvegardé', 'success');
+            }
+        }
+
+        function loadProject() {
+            if (!SAVE_ENABLED) { showNotification(t('save_disabled') || 'Chargement désactivé dans cette version', 'warning'); return; }
+            const index = getProjectsIndex();
+            if (index.length === 0) {
+                showNotification(t('no_projects') || 'Aucun projet sauvegardé', 'warning');
+                return;
+            }
+            showProjectsModal(index);
+        }
+
+        function loadProjectById(projectId) {
+            try {
+                const raw = localStorage.getItem(STORAGE_PREFIX + projectId);
+                if (!raw) {
+                    showNotification(t('load_error') || 'Projet introuvable', 'error');
+                    return;
+                }
+                const data = JSON.parse(raw);
+                if (restoreProject(data)) {
+                    closeProjectsModal();
+                    goToStep(1);
+                    showNotification(t('project_loaded') || 'Projet chargé', 'success');
+                }
+            } catch(e) {
+                showNotification(t('load_error') || 'Erreur de chargement', 'error');
+            }
+        }
+
+        function deleteProject(projectId) {
+            localStorage.removeItem(STORAGE_PREFIX + projectId);
+            let index = getProjectsIndex();
+            index = index.filter(p => p.id !== projectId);
+            saveProjectsIndex(index);
+            // Refresh modal
+            if (index.length === 0) {
+                closeProjectsModal();
+                showNotification(t('no_projects') || 'Aucun projet sauvegardé', 'warning');
+            } else {
+                showProjectsModal(index);
+            }
+        }
+
+        function showProjectsModal(index) {
+            // Remove existing modal if any
+            closeProjectsModal();
+
+            const modeIcons = { unique: '🎨', series: '📦', service: '🔧' };
+            let listHtml = '';
+            index.forEach(p => {
+                const date = new Date(p.savedAt);
+                const dateStr = date.toLocaleDateString(currentLanguage === 'fr' ? 'fr-FR' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const icon = modeIcons[p.productionType] || '📋';
+                listHtml += `
+                    <div class="project-list-item">
+                        <div class="project-list-info" onclick="loadProjectById('${p.id}')">
+                            <span class="project-list-icon">${icon}</span>
+                            <div>
+                                <div class="project-list-name">${p.name}</div>
+                                <div class="project-list-date">${dateStr}</div>
+                            </div>
+                        </div>
+                        <button class="project-list-delete" onclick="event.stopPropagation(); deleteProject('${p.id}')" title="${t('delete') || 'Supprimer'}">🗑️</button>
+                    </div>`;
+            });
+
+            const modal = document.createElement('div');
+            modal.id = 'projectsModal';
+            modal.className = 'projects-modal-overlay';
+            modal.innerHTML = `
+                <div class="projects-modal">
+                    <div class="projects-modal-header">
+                        <h3>📂 ${t('saved_projects') || 'Projets sauvegardés'}</h3>
+                        <button class="projects-modal-close" onclick="closeProjectsModal()">✕</button>
+                    </div>
+                    <div class="projects-modal-list">${listHtml}</div>
+                    <div class="projects-modal-footer">
+                        <button class="btn-action" onclick="exportProjectJSON()">📤 ${t('export_json') || 'Exporter projet courant'}</button>
+                        <button class="btn-action" onclick="importProjectJSON()">📥 ${t('import_json') || 'Importer un projet'}</button>
+                    </div>
+                </div>`;
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeProjectsModal();
+            });
+            document.body.appendChild(modal);
+        }
+
+        function exportProjectJSON() {
+            if (!SAVE_ENABLED) { showNotification(t('save_disabled') || 'Export désactivé dans cette version', 'warning'); return; }
+            const name = document.getElementById('projectName')?.value?.trim() || 'projet';
+            const data = serializeProject();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = name.replace(/[^a-zA-Z0-9àâäéèêëïîôùûüçÀÂÄÉÈÊËÏÎÔÙÛÜÇ _-]/g, '_') + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(t('export_done') || 'Projet exporté', 'success');
+        }
+
+        function importProjectJSON() {
+            if (!SAVE_ENABLED) { showNotification(t('save_disabled') || 'Import désactivé dans cette version', 'warning'); return; }
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    try {
+                        const data = JSON.parse(ev.target.result);
+                        if (restoreProject(data)) {
+                            closeProjectsModal();
+                            goToStep(1);
+                            showNotification(t('import_done') || 'Projet importé', 'success');
+                        }
+                    } catch(err) {
+                        showNotification(t('import_error') || 'Fichier invalide', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function closeProjectsModal() {
+            const modal = document.getElementById('projectsModal');
+            if (modal) modal.remove();
+        }
+
+        function collectProjectData() {
+            // Materials cost (already computed by our dynamic lists)
+            let materialCostTotal = 0;
+            materials.forEach(mat => { materialCostTotal += getMaterialCost(mat); });
+
+            // Components cost + labor time
+            let componentCostTotal = 0;
+            let componentLaborHours = 0;
+            components.forEach(comp => {
+                componentCostTotal += comp.cost;
+                componentLaborHours += (comp.laborMinutes || 0) / 60;
+            });
+
+            // Times
+            const machPrintH = timeToHours(
+                document.getElementById('machPrintH')?.value,
+                document.getElementById('machPrintM')?.value
+            );
+            const machCalibH = timeToHours(
+                document.getElementById('machCalibH')?.value,
+                document.getElementById('machCalibM')?.value
+            );
+            const machineTime = machPrintH + machCalibH;
+
+            const humanDesign = timeToHours(document.getElementById('humanDesignH')?.value, document.getElementById('humanDesignM')?.value);
+            const humanPrep = timeToHours(document.getElementById('humanPrepH')?.value, document.getElementById('humanPrepM')?.value);
+            const humanSuperv = timeToHours(document.getElementById('humanSupervH')?.value, document.getElementById('humanSupervM')?.value);
+            const humanPost = timeToHours(document.getElementById('humanPostH')?.value, document.getElementById('humanPostM')?.value);
+            const humanAssembly = timeToHours(document.getElementById('humanAssemblyH')?.value, document.getElementById('humanAssemblyM')?.value);
+            const humanTime = humanDesign + humanPrep + humanSuperv + humanPost + humanAssembly + componentLaborHours;
+
+            // Equipment amortization
+            let equipHourlyCost = 0;
+            equipments.forEach(eq => { equipHourlyCost += getEquipmentHourlyCost(eq); });
+
+            // Software amortization
+            let softHourlyCost = 0;
+            softwares.forEach(sw => { softHourlyCost += getSoftwareHourlyCost(sw); });
+
+            // Electricity
+            const kwhCost = parseFloat(document.getElementById('kwhCost')?.value) || 0;
+            const machineWattage = parseFloat(document.getElementById('machineWattage')?.value) || 0;
+            const realConsumption = expertMode ? (parseFloat(document.getElementById('realConsumption')?.value) || 0) : 0;
+
+            // Hourly rate
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate')?.value) || 0;
+
+            // Prototypes & errors
+            const prototypeCount = parseFloat(document.getElementById('prototypeCount')?.value) || 0;
+            const prototypeSurcharge = parseFloat(document.getElementById('prototypeSurcharge')?.value) || 0;
+            const errorRate = parseFloat(document.getElementById('errorRate')?.value) || 0;
+            const errorTimeH = timeToHours(document.getElementById('errorTimeH')?.value, document.getElementById('errorTimeM')?.value);
+
+            // Pricing
+            const marginPercent = parseFloat(document.getElementById('marginPercent')?.value) || 0;
+            const vatRate = parseFloat(document.getElementById('vatRate')?.value) || 0;
+            const deliveryCost = parseFloat(document.getElementById('deliveryCost')?.value) || 0;
+
+            // Series quantity
+            const quantity = currentProductionType === 'series' ? 
+                (parseFloat(document.getElementById('seriesQuantity')?.value) || 1) : 1;
+
+            return {
+                materialCostTotal, componentCostTotal, componentLaborHours,
+                machineTime, machPrintH, machCalibH,
+                humanTime, humanDesign, humanPrep, humanSuperv, humanPost, humanAssembly,
+                equipHourlyCost, softHourlyCost,
+                kwhCost, machineWattage, realConsumption,
+                hourlyRate,
+                prototypeCount, prototypeSurcharge, prototypeBillable,
+                errorRate, errorTimeH,
+                marginPercent, vatRate, deliveryCost,
+                quantity, productionType: currentProductionType
+            };
+        }
+
+        function performCalculations(d) {
+            // 1. Matières
+            const matCost = d.materialCostTotal;
+
+            // 2. Composants
+            const compCost = d.componentCostTotal;
+
+            // 3. Électricité (réelle ou estimée)
+            let electricityCost = 0;
+            if (d.realConsumption > 0) {
+                electricityCost = d.realConsumption * d.kwhCost;
+            } else {
+                electricityCost = d.machineTime * d.machineWattage / 1000 * d.kwhCost;
+            }
+
+            // 4. Amortissement équipement (proportionnel au TEMPS MACHINE uniquement)
+            const equipAmortCost = d.equipHourlyCost * d.machineTime;
+
+            // 5. Main d'œuvre
+            const laborCost = d.humanTime * d.hourlyRate;
+
+            // 6. Logiciels (proportionnel au temps humain)
+            const softwareCost = d.softHourlyCost * d.humanTime;
+
+            // 7. Prototypes (indépendant du toggle billable pour le calcul du coût)
+            let prototypeCost = 0;
+            if (d.prototypeCount > 0) {
+                const basePerProto = matCost + electricityCost + laborCost;
+                prototypeCost = d.prototypeCount * basePerProto * (d.prototypeSurcharge / 100);
+            }
+
+            // 8. Erreurs internes (toujours calculées si taux > 0, indépendant de billable)
+            let errorCost = 0;
+            if (d.errorRate > 0) {
+                const baseCost = matCost + electricityCost + laborCost;
+                errorCost = baseCost * (d.errorRate / 100);
+            }
+
+            // Proto + erreurs
+            // D11: si billable=non, prototypes exclus du prix TTC (absorbés par l'artisan)
+            // Erreurs internes toujours incluses (D8)
+            const billableProtoCost = d.prototypeBillable ? prototypeCost : 0;
+            const protoErrorCost = billableProtoCost + errorCost;
+            const absorbedProtoCost = d.prototypeBillable ? 0 : prototypeCost;
+
+            // Temps total
+            const totalProjectTime = d.machineTime + d.humanTime;
+
+            // Coût de revient HT
+            const costPriceHT = matCost + compCost + electricityCost + equipAmortCost + laborCost + softwareCost + protoErrorCost;
+
+            // Marge
+            const marginAmount = costPriceHT * (d.marginPercent / 100);
+
+            // Prix HT
+            const priceHT = costPriceHT + marginAmount;
+
+            // Livraison + TVA
+            const priceBeforeVAT = priceHT + d.deliveryCost;
+            const vatAmount = priceBeforeVAT * (d.vatRate / 100);
+            const priceTTC = priceBeforeVAT + vatAmount;
+
+            // Par pièce (série)
+            const pricePerUnit = priceTTC / d.quantity;
+            const profitPerUnit = marginAmount / d.quantity;
+
+            return {
+                matCost, compCost, electricityCost, equipAmortCost,
+                laborCost, softwareCost, protoErrorCost, prototypeCost, errorCost,
+                absorbedProtoCost, prototypeBillable: d.prototypeBillable,
+                costPriceHT, marginAmount, priceHT,
+                deliveryCost: d.deliveryCost, vatAmount, priceTTC,
+                pricePerUnit, profitPerUnit,
+                quantity: d.quantity,
+                totalTime: totalProjectTime,
+                humanTime: d.humanTime, machineTime: d.machineTime,
+                marginPercent: d.marginPercent, vatRate: d.vatRate
+            };
+        }
+
+        function calculateProject() {
+            try {
+                const data = collectProjectData();
+                const r = performCalculations(data);
+                displayResults(r);
+                showNotification('Calcul terminé !', 'success');
+            } catch (error) {
+                console.error('Erreur calcul:', error);
+                showNotification('Erreur lors du calcul', 'error');
+            }
+        }
+
+        function displayResults(r) {
+            // Big result
+            document.getElementById('resultBig').style.display = 'block';
+            document.getElementById('resultBreakdown').style.display = 'block';
+            document.getElementById('resultActions').style.display = 'block';
+
+            const isMulti = r.quantity > 1;
+            document.getElementById('resultPriceTTC').textContent = (isMulti ? r.pricePerUnit : r.priceTTC).toFixed(2) + '€';
+            document.getElementById('resultUnit').textContent = isMulti ? t('per_piece') : '';
+
+            // Breakdown — only show non-zero lines
+            let html = '';
+            function line(label, value, cls) {
+                cls = cls || '';
+                html += `<div class="result-line ${cls}"><span class="label">${label}</span><span>${value}</span></div>`;
+            }
+
+            if (r.matCost > 0) line(t('materials_cost'), r.matCost.toFixed(2) + '€');
+            if (r.compCost > 0) line(t('components_cost'), r.compCost.toFixed(2) + '€');
+            if (r.electricityCost > 0) line(t('electricity_cost') + ' (' + formatTime(r.machineTime) + ')', r.electricityCost.toFixed(2) + '€');
+            if (r.equipAmortCost > 0) line(t('equipment_amortization') + ' (' + formatTime(r.machineTime) + ')', r.equipAmortCost.toFixed(2) + '€');
+            if (r.laborCost > 0) line(t('labor_cost') + ' (' + formatTime(r.humanTime) + ')', r.laborCost.toFixed(2) + '€');
+            if (r.softwareCost > 0) line(t('software_cost'), r.softwareCost.toFixed(2) + '€');
+            if (r.protoErrorCost > 0) line(t('prototype_error_cost'), r.protoErrorCost.toFixed(2) + '€');
+            if (r.absorbedProtoCost > 0) {
+                html += `<div class="result-line" style="color:var(--danger);font-style:italic;"><span class="label">⚠️ ${t('prototype_error_cost')} (${t('not_billable_info').split('.')[0]})</span><span>-${r.absorbedProtoCost.toFixed(2)}€</span></div>`;
+            }
+            line('= ' + t('cost_price_ht'), r.costPriceHT.toFixed(2) + '€', 'highlight');
+            line('+ ' + t('margin') + ' ' + r.marginPercent + '%', r.marginAmount.toFixed(2) + '€');
+            line('= ' + t('price_ht'), r.priceHT.toFixed(2) + '€', 'highlight');
+            if (r.deliveryCost > 0) {
+                line('+ ' + t('delivery'), r.deliveryCost.toFixed(2) + '€');
+            }
+            line('+ ' + t('vat') + ' ' + r.vatRate + '%', r.vatAmount.toFixed(2) + '€');
+            line('= ' + t('price_ttc'), r.priceTTC.toFixed(2) + '€', 'total');
+
+            if (isMulti) {
+                html += `<div class="result-line" style="margin-top:8px;font-style:italic;color:var(--text-light);"><span class="label">÷ ${r.quantity} ${t('series')}</span><span>${r.pricePerUnit.toFixed(2)}€ / ${t('per_piece')}</span></div>`;
+            }
+
+            document.getElementById('breakdownContent').innerHTML = html;
+
+            // Profit indicator
+            const indicator = document.getElementById('profitIndicator');
+            indicator.style.display = 'flex';
+            if (r.profitPerUnit >= 0) {
+                indicator.className = 'profit-indicator positive';
+                indicator.textContent = '✅ ' + t('profit_per_piece').replace('{amount}', r.profitPerUnit.toFixed(2) + '€');
+            } else {
+                indicator.className = 'profit-indicator negative';
+                indicator.textContent = '⚠️ ' + t('profit_per_piece').replace('{amount}', r.profitPerUnit.toFixed(2) + '€');
+            }
+
+            document.getElementById('resultBig').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function copyCalculations() {
+            try {
+                const data = collectProjectData();
+                const r = performCalculations(data);
+                const sep = '─'.repeat(40);
+                let text = '';
+                text += `${t('project_name')} : ${document.getElementById('projectName')?.value || 'Sans nom'}\n`;
+                text += `${sep}\n`;
+                if (r.matCost > 0) text += `${t('materials_cost')} : ${r.matCost.toFixed(2)}€\n`;
+                if (r.compCost > 0) text += `${t('components_cost')} : ${r.compCost.toFixed(2)}€\n`;
+                if (r.electricityCost > 0) text += `${t('electricity_cost')} : ${r.electricityCost.toFixed(2)}€\n`;
+                if (r.equipAmortCost > 0) text += `${t('equipment_amortization')} : ${r.equipAmortCost.toFixed(2)}€\n`;
+                if (r.laborCost > 0) text += `${t('labor_cost')} (${formatTime(r.humanTime)}) : ${r.laborCost.toFixed(2)}€\n`;
+                if (r.softwareCost > 0) text += `${t('software_cost')} : ${r.softwareCost.toFixed(2)}€\n`;
+                if (r.protoErrorCost > 0) text += `${t('prototype_error_cost')} : ${r.protoErrorCost.toFixed(2)}€\n`;
+                if (r.absorbedProtoCost > 0) text += `⚠️ ${t('prototype_error_cost')} (${t('billable_to_client')}: ${t('no')}) : -${r.absorbedProtoCost.toFixed(2)}€\n`;
+                text += `${sep}\n`;
+                text += `= ${t('cost_price_ht')} : ${r.costPriceHT.toFixed(2)}€\n`;
+                text += `+ ${t('margin')} ${r.marginPercent}% : ${r.marginAmount.toFixed(2)}€\n`;
+                text += `= ${t('price_ht')} : ${r.priceHT.toFixed(2)}€\n`;
+                if (r.deliveryCost > 0) text += `+ ${t('delivery')} : ${r.deliveryCost.toFixed(2)}€\n`;
+                text += `+ ${t('vat')} ${r.vatRate}% : ${r.vatAmount.toFixed(2)}€\n`;
+                text += `${'═'.repeat(40)}\n`;
+                text += `= ${t('price_ttc')} : ${r.priceTTC.toFixed(2)}€\n`;
+                if (r.quantity > 1) text += `  (${r.pricePerUnit.toFixed(2)}€/${t('per_piece')} × ${r.quantity})\n`;
+
+                navigator.clipboard.writeText(text).then(() => {
+                    showNotification(t('copy_calculations') + ' ✓', 'success');
+                }).catch(() => {
+                    showNotification('Erreur copie', 'error');
+                });
+            } catch(e) {
+                showNotification('Erreur', 'error');
+            }
+        }
+
+        /* ===== MODULE : UTILITAIRES ===== */
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        /* ===== MODULE : MINI-CALCULATRICE (tous champs numériques) ===== */
+        // Tape "184+264" dans un champ numérique → quitte le champ → affiche "448"
+        // Astuce : on bascule temporairement en type=text quand un opérateur est détecté
+
+        (function() {
+            function evalExpression(raw) {
+                if (!raw || raw.length < 2) return null;
+                // Remplacer virgules par points (support FR)
+                raw = raw.replace(/,/g, '.');
+                // Ne traiter que si un opérateur est présent
+                if (!/[+\-*/]/.test(raw)) return null;
+                // Sécurité : n'accepter que chiffres, opérateurs, points, espaces, parenthèses
+                if (!/^[\d\s+\-*/.()]+$/.test(raw)) return null;
+                try {
+                    const result = Function('"use strict"; return (' + raw + ')')();
+                    if (isFinite(result) && !isNaN(result)) {
+                        return parseFloat(result.toFixed(4));
+                    }
+                } catch(e) {}
+                return null;
+            }
+
+            document.addEventListener('keydown', function(e) {
+                const input = e.target;
+                if (input.tagName !== 'INPUT' || input.type !== 'number') return;
+                
+                // Si l'utilisateur tape un opérateur (+, *, /), basculer en mode texte
+                if (['+', '*', '/', '(', ')'].includes(e.key)) {
+                    const curVal = input.value;
+                    input.type = 'text';
+                    input.value = curVal;
+                    input.dataset.wasNumber = 'true';
+                    // Forcer le curseur à la fin après bascule
+                    requestAnimationFrame(function() {
+                        const len = input.value.length;
+                        input.setSelectionRange(len, len);
+                    });
+                }
+            }, true);
+
+            document.addEventListener('keydown', function(e) {
+                const input = e.target;
+                if (input.tagName !== 'INPUT' || input.dataset.wasNumber !== 'true') return;
+
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    resolveExpression(input);
+                }
+            });
+
+            document.addEventListener('focusout', function(e) {
+                const input = e.target;
+                if (input.tagName === 'INPUT' && input.dataset.wasNumber === 'true') {
+                    resolveExpression(input);
+                }
+            });
+
+            function resolveExpression(input) {
+                const raw = input.value.trim();
+                const result = evalExpression(raw);
+
+                // Revenir en type=number
+                input.type = 'number';
+                delete input.dataset.wasNumber;
+
+                if (result !== null) {
+                    input.value = result;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                } else if (raw && !isNaN(parseFloat(raw.replace(/,/g, '.')))) {
+                    input.value = parseFloat(raw.replace(/,/g, '.'));
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+
+            // Support du collage d'expressions
+            document.addEventListener('paste', function(e) {
+                const input = e.target;
+                if (input.tagName !== 'INPUT' || input.type !== 'number') return;
+
+                const pasted = (e.clipboardData || window.clipboardData).getData('text');
+                if (pasted && /[+\-*/]/.test(pasted)) {
+                    e.preventDefault();
+                    input.type = 'text';
+                    input.value = pasted;
+                    input.dataset.wasNumber = 'true';
+                }
+            }, true);
+        })();
+
+        /* ===== INIT ===== */
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setLanguage(currentLanguage);
+            renderStepper();
+            showStep(1);
+            updateModeBadge();
+            updateExpertIndicator();
+
+            // Set project number to next available
+            const nextNum = getProjectCounter() + 1;
+            document.getElementById('projectNumber').value = formatProjectNumber(nextNum);
+
+            // Listen for hourly rate changes
+            const hrInput = document.getElementById('hourlyRate');
+            if (hrInput) {
+                hrInput.addEventListener('input', updateGlobalHourly);
+            }
+
+            // UX: select all content on focus for number inputs (clear the 0)
+            document.addEventListener('focusin', function(e) {
+                if (e.target.tagName === 'INPUT' && (e.target.type === 'number' || e.target.type === 'text')) {
+                    requestAnimationFrame(() => e.target.select());
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
