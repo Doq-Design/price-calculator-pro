@@ -16,3 +16,7 @@ Take a real job and try:
 - Set a margin
 
 → You get a price instantly
+
+## Feedback
+
+If you try it on a real case, I’d really appreciate your feedback.
