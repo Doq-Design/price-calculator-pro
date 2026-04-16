@@ -1174,6 +1174,7 @@
             <div class="header-actions">
                 <button class="header-btn" id="btnLangFr" onclick="setLanguage('fr')">FR</button>
                 <button class="header-btn" id="btnLangEn" onclick="setLanguage('en')">EN</button>
+                <button class="header-btn" id="btnLangIt" onclick="setLanguage('it')">IT</button>
                 <button class="header-btn" onclick="saveProject()">💾</button>
             </div>
         </div>
@@ -2126,6 +2127,216 @@
                 import_done: "Project imported ✓",
                 import_error: "Invalid file",
                 save_disabled: "Feature disabled in this version",
+            },
+
+            it: {
+                // App
+                app_title: "Calcolatore di Prezzo Pro",
+
+                // Navigation
+                step1_title: "Il mio Progetto",
+                step1_subtitle: "Identificate il vostro prodotto o servizio",
+                step2_title: "Materiali e Componenti",
+                step2_subtitle: "Ciò che entra fisicamente nel vostro prodotto",
+                step3_title: "Tempo di produzione",
+                step3_subtitle: "Quanto tempo per realizzare questo progetto",
+                step4_title: "La mia Attività",
+                step4_subtitle: "I vostri costi operativi — da compilare una sola volta",
+                step5_title: "Prototipi ed Errori",
+                step5_subtitle: "Integrate i vostri costi di apprendimento",
+                step6_title: "Il mio Prezzo",
+                step6_subtitle: "Risultato e regolazione della tariffa",
+
+                // Stepper labels
+                step1_short: "Progetto",
+                step2_short: "Materiali",
+                step3_short: "Tempo",
+                step4_short: "Attività",
+                step5_short: "Proto/Errori",
+                step6_short: "Il mio Prezzo",
+
+                // Étape 1
+                project_info: "Informazioni del progetto",
+                project_name: "Nome del progetto",
+                project_number: "Numero",
+                category: "Categoria",
+                production_type: "Tipo di produzione",
+                single_piece: "Pezzo unico",
+                single_piece_desc: "Su misura",
+                series: "Serie",
+                series_desc: "Più esemplari identici",
+                service: "Servizio",
+                service_desc: "Tempo e competenza",
+                how_many_pieces: "Quanti pezzi in questa serie?",
+                series_hint: "💡 I costi di progettazione e prototipazione saranno automaticamente ripartiti su ogni pezzo.",
+
+                // Étape 2
+                raw_materials: "Materie prime",
+                components: "Componenti e Forniture",
+                type: "Tipo",
+                quantity_used: "Quantità utilizzata",
+                unit_price: "Prezzo unitario",
+                total: "Totale",
+                add_material: "+ Aggiungere un materiale",
+                add_component: "+ Aggiungere un componente",
+                component_name: "Nome",
+                cost: "Costo (€)",
+                labor_time: "Tempo (min)",
+
+                // Étape 3
+                machine_time: "Tempo macchina / attrezzatura",
+                human_time: "Tempo umano",
+                printing: "Produzione",
+                calibration: "Avviamento",
+                design: "Progettazione / Design",
+                preparation: "Preparazione",
+                supervision: "Supervisione",
+                post_processing: "Post-lavorazione / Finitura",
+                assembly: "Assemblaggio",
+                hours: "Ore",
+                minutes: "Minuti",
+                time_templates: "Modelli di tempo",
+
+                // Étape 4
+                my_business: "La mia Attività",
+                equipment: "Attrezzatura",
+                purchase_price: "Prezzo d'acquisto (€)",
+                lifespan_years: "Durata di vita (anni)",
+                usage_hours_year: "Ore di utilizzo/anno",
+                maintenance_year: "Manutenzione/anno (€)",
+                software: "Software",
+                annual_cost: "Costo annuale (€)",
+                electricity: "Elettricità",
+                kwh_cost: "Costo per kWh (€)",
+                consumption_kwh: "Consumo (kWh)",
+                hourly_rate: "Tariffa oraria (€/h)",
+                hourly_rate_hint: "La vostra tariffa oraria desiderata",
+                labor: "Manodopera",
+                amortization_detail: "Dettaglio ammortamento",
+                equipment_amort_title: "Attrezzatura — Ammortamento",
+                equipment_hourly_cost: "Ammortamento orario attrezzatura",
+                real_consumption: "Consumo reale",
+                real_kwh: "Consumo rilevato (kWh)",
+                real_kwh_hint: "Se compilato, prioritario sulla stima in watt",
+
+                // Étape 5
+                prototypes: "Prototipi",
+                prototype_count: "Numero di prototipi",
+                prototype_surcharge: "Maggiorazione (%)",
+                billable_to_client: "Fatturabile al cliente",
+                yes: "Sì",
+                no: "No",
+                errors: "Errori interni",
+                error_rate: "Tasso di errore (%)",
+                time_lost: "Tempo perso per errore",
+
+                // Étape 6
+                calculate: "Calcola il mio prezzo",
+                cost_breakdown: "Scomposizione del prezzo",
+                materials_cost: "Materiali",
+                components_cost: "Componenti",
+                electricity_cost: "Elettricità",
+                equipment_amortization: "Ammortamento attrezzatura",
+                labor_cost: "Manodopera",
+                software_cost: "Software",
+                prototype_error_cost: "Prototipi ed errori",
+                cost_price_ht: "Costo di produzione (IVA esclusa)",
+                margin: "Margine",
+                price_ht: "Prezzo (IVA esclusa)",
+                delivery: "Spedizione",
+                vat: "IVA",
+                price_ttc: "Prezzo finale (IVA inclusa)",
+                profit_per_piece: "Guadagnate {amount} per pezzo",
+                volume_simulation: "Simulazione volume",
+
+                // Actions
+                save: "Salvare",
+                load: "Caricare",
+                previous: "Precedente",
+                next: "Seguente",
+                copy_calculations: "Copiare calcoli",
+                export_report: "Esportare rapporto",
+                step_of: "Fase {current}/{total}",
+
+                // Mode expert
+                expert_mode: "Modalità esperto",
+                mode_normal: "Normale",
+                mode_expert: "Esperto",
+                database: "Database",
+                import_export: "Importa / Esporta",
+                counter_management: "Gestione contatore",
+                detailed_formulas: "Formule dettagliate",
+
+                // Materials - modes
+                mode_direct: "Quantità",
+                mode_container: "Contenitore",
+                material_name: "Nome",
+                material_quantity: "Quantità",
+                material_unit: "Unità",
+                material_unit_price: "Prezzo/unità",
+                container_price: "Prezzo contenitore",
+                container_uses: "Progetti per contenitore",
+                cost_per_use: "Costo/utilizzo",
+                total_materials: "Totale materiali",
+                total_components: "Totale componenti",
+                material_name_placeholder: "Es: PLA Bianco, Pelle, Lucido...",
+                component_name_placeholder: "Es: Striscia LED, Vite M3, Vernice...",
+                project_name_placeholder: "Es: Litofania cliente Rossi",
+
+                // Units
+                unit_g: "g",
+                unit_kg: "kg",
+                unit_ml: "ml",
+                unit_l: "L",
+                unit_m: "m",
+                unit_cm: "cm",
+                unit_pcs: "pz",
+
+                // Step 3 extras
+                design_series_hint: "In modalità serie, questo tempo sarà ripartito su tutti i pezzi.",
+
+                // Step 4 extras
+                add_equipment: "Aggiungere un'attrezzatura",
+                equipment_name: "Nome dell'attrezzatura",
+                equipment_name_placeholder: "Es: Stampante 3D, Macchina da cucire...",
+                equipment_hourly_cost: "Costo orario attrezzatura",
+                add_software: "Aggiungere un software",
+                software_name: "Nome del software",
+                software_name_placeholder: "Es: Fusion 360, Photoshop...",
+                software_hourly_cost: "Costo orario software",
+                machine_wattage: "Potenza macchina (W)",
+                wattage_hint: "Consumo medio della vostra macchina",
+                global_hourly_label: "A titolo indicativo — Costo orario della vostra struttura",
+                global_hourly_detail: "Tenendo conto degli elementi sopra (salario + macchine + software)",
+                usage_hours_year: "Ore/anno",
+
+                // Step 5 extras
+                surcharge_hint: "Sovrapprezzo materiale per prototipo",
+                not_billable_info: "Il costo dei prototipi sarà assorbito nelle vostre spese.",
+                errors_desc: "Distribuzione del costo delle produzioni fallite",
+
+                // Step 6 extras
+                pricing_params: "Parametri di prezzo",
+                per_piece: "per pezzo",
+                monthly_volume: "Volume mensile (progetti)",
+                working_hours_month: "Ore di lavoro/mese",
+
+                // Save/Load
+                saved_projects: "Progetti salvati",
+                project_saved: "Progetto salvato ✓",
+                project_updated: "Progetto aggiornato ✓",
+                project_loaded: "Progetto caricato ✓",
+                project_deleted: "Progetto eliminato",
+                no_projects: "Nessun progetto salvato",
+                name_required: "Date un nome al progetto",
+                load_error: "Errore di caricamento",
+                delete: "Eliminare",
+                export_json: "Esportare il progetto corrente",
+                import_json: "Importare un progetto",
+                export_done: "Progetto esportato ✓",
+                import_done: "Progetto importato ✓",
+                import_error: "File non valido",
+                save_disabled: "Funzionalità disattivata in questa versione",
             }
         };
 
@@ -2177,6 +2388,7 @@
             // Update lang buttons
             document.getElementById('btnLangFr').classList.toggle('active', lang === 'fr');
             document.getElementById('btnLangEn').classList.toggle('active', lang === 'en');
+            document.getElementById('btnLangIt').classList.toggle('active', lang === 'it');
 
             // Translate all data-i18n elements
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -3002,7 +3214,7 @@
                 const el = document.getElementById(id);
                 if (el) fields[id] = el.value;
             });
-            return {
+            const result = {
                 version: '1.0',
                 savedAt: new Date().toISOString(),
                 productionType: currentProductionType,
@@ -3013,6 +3225,13 @@
                 equipments: equipments.map(e => ({ name: e.name, purchasePrice: e.purchasePrice, lifespanYears: e.lifespanYears, usageHoursYear: e.usageHoursYear, maintenanceYear: e.maintenanceYear })),
                 softwares: softwares.map(s => ({ name: s.name, annualCost: s.annualCost, usageHoursYear: s.usageHoursYear }))
             };
+            console.log('[SAVE] Serialized:', JSON.stringify({
+                mat: result.materials.length,
+                eq: result.equipments.length,
+                sw: result.softwares.length,
+                fields: Object.keys(result.fields).length
+            }));
+            return result;
         }
 
         function restoreProject(data) {
@@ -3020,6 +3239,16 @@
                 showNotification(t('load_error') || 'Erreur de chargement', 'error');
                 return false;
             }
+
+            console.log('[LOAD] Data received:', JSON.stringify({
+                mat: (data.materials || []).length,
+                eq: (data.equipments || []).length,
+                sw: (data.softwares || []).length,
+                fields: Object.keys(data.fields || {}).length,
+                sampleMat: data.materials?.[0],
+                sampleEq: data.equipments?.[0],
+                sampleSw: data.softwares?.[0]
+            }));
 
             // Restore scalar fields
             Object.keys(data.fields || {}).forEach(id => {
@@ -3057,6 +3286,9 @@
             softwares = [];
             softwareIdCounter = 0;
             (data.softwares || []).forEach(s => addSoftware(s));
+
+            console.log('[LOAD] After restore — materials:', materials.length, 'equipments:', equipments.length, 'softwares:', softwares.length);
+            console.log('[LOAD] Materials array:', JSON.stringify(materials));
 
             return true;
         }
@@ -3159,7 +3391,8 @@
             let listHtml = '';
             index.forEach(p => {
                 const date = new Date(p.savedAt);
-                const dateStr = date.toLocaleDateString(currentLanguage === 'fr' ? 'fr-FR' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const dateLocale = { fr: 'fr-FR', en: 'en-GB', it: 'it-IT' }[currentLanguage] || 'fr-FR';
+                const dateStr = date.toLocaleDateString(dateLocale, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                 const icon = modeIcons[p.productionType] || '📋';
                 listHtml += `
                     <div class="project-list-item">
