@@ -1,5 +1,5 @@
 # price-calculator-pro
-Professional price calculator for artisans and small producers
+Professional price calculator for artisans and small producers and businesses
 
 ## Try it
 
