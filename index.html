@@ -422,6 +422,18 @@
             border-color: var(--primary-light);
         }
 
+        .toggle-option.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+            background: var(--bg);
+        }
+
+        .toggle-option.disabled .toggle-label::after {
+            content: " 🚧";
+            font-size: 10px;
+        }
+
         .toggle-option.selected {
             border-color: var(--primary);
             background: rgba(26, 82, 118, 0.05);
@@ -1248,16 +1260,19 @@
                             <div class="toggle-label" data-i18n="single_piece">Pièce unique</div>
                             <div class="toggle-desc" data-i18n="single_piece_desc">Sur mesure</div>
                         </div>
-                        <div class="toggle-option" onclick="selectProductionType('series', this)">
+                        <div class="toggle-option disabled">
                             <div class="toggle-icon">📦</div>
                             <div class="toggle-label" data-i18n="series">Série</div>
                             <div class="toggle-desc" data-i18n="series_desc">Plusieurs exemplaires</div>
                         </div>
-                        <div class="toggle-option" onclick="selectProductionType('service', this)">
+                        <div class="toggle-option disabled">
                             <div class="toggle-icon">🔧</div>
                             <div class="toggle-label" data-i18n="service">Service</div>
                             <div class="toggle-desc" data-i18n="service_desc">Temps & expertise</div>
                         </div>
+                    </div>
+                    <div style="margin-top:8px;padding:6px 12px;background:#fff3cd;border-radius:6px;font-size:11px;color:#856404;text-align:center;">
+                        🚧 <span data-i18n="modes_wip">Les modes Série et Service sont en cours de développement.</span>
                     </div>
                 </div>
 
@@ -1917,6 +1932,7 @@
                 import_done: "Projet importé ✓",
                 import_error: "Fichier invalide",
                 save_disabled: "Fonctionnalité désactivée dans cette version",
+                modes_wip: "Les modes Série et Service sont en cours de développement.",
             },
 
             en: {
@@ -2127,6 +2143,7 @@
                 import_done: "Project imported ✓",
                 import_error: "Invalid file",
                 save_disabled: "Feature disabled in this version",
+                modes_wip: "Series and Service modes are under development.",
             },
 
             it: {
@@ -2337,6 +2354,7 @@
                 import_done: "Progetto importato ✓",
                 import_error: "File non valido",
                 save_disabled: "Funzionalità disattivata in questa versione",
+                modes_wip: "Le modalità Serie e Servizio sono in fase di sviluppo.",
             }
         };
 
