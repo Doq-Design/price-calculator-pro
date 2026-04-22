@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-
-	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-	<meta http-equiv="Pragma" content="no-cache">
-	<meta http-equiv="Expires" content="0">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculateur de Prix Pro V1.0D</title>
@@ -1323,8 +1319,8 @@
             </div>
 
             <!-- COMPOSANTS & FOURNITURES -->
-            <div class="card">
-                <div class="card-title"><span class="icon">🔩</span> <span data-i18n="components">Composants & Fournitures</span></div>
+            <div class="card expert-only">
+                <div class="card-title"><span class="icon">🔩</span> <span data-i18n="components">Composants & Fournitures</span> <span class="expert-badge">Expert</span></div>
 
                 <div id="componentsList">
                     <!-- Dynamic rows inserted here by JS -->
@@ -1372,7 +1368,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group expert-only">
                     <label class="form-label" data-i18n="calibration">Mise en route</label>
                     <div class="time-group">
                         <div class="time-field">
@@ -1408,7 +1404,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group expert-only">
                     <label class="form-label" data-i18n="preparation">Préparation</label>
                     <div class="time-group">
                         <div class="time-field">
@@ -1422,7 +1418,7 @@
                     </div>
                 </div>
 
-                <div class="form-group" id="supervisionGroup">
+                <div class="form-group expert-only" id="supervisionGroup">
                     <label class="form-label" data-i18n="supervision">Surveillance</label>
                     <div class="time-group">
                         <div class="time-field">
@@ -1436,7 +1432,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group expert-only">
                     <label class="form-label" data-i18n="post_processing">Post-traitement / Finition</label>
                     <div class="time-group">
                         <div class="time-field">
@@ -1450,7 +1446,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group expert-only">
                     <label class="form-label" data-i18n="assembly">Assemblage</label>
                     <div class="time-group">
                         <div class="time-field">
@@ -1482,8 +1478,8 @@
             <p class="step-subtitle" data-i18n="step4_subtitle">Vos coûts d'exploitation — à remplir une fois</p>
 
             <!-- ÉQUIPEMENT (liste dynamique) -->
-            <div class="card">
-                <div class="card-title"><span class="icon">🏭</span> <span data-i18n="equipment_amort_title">Équipement — Amortissement</span></div>
+            <div class="card expert-only">
+                <div class="card-title"><span class="icon">🏭</span> <span data-i18n="equipment_amort_title">Équipement — Amortissement</span> <span class="expert-badge">Expert</span></div>
 
                 <div id="equipmentList">
                     <!-- Dynamic rows inserted by JS -->
@@ -1498,8 +1494,8 @@
             </div>
 
             <!-- LOGICIELS (liste dynamique) -->
-            <div class="card">
-                <div class="card-title"><span class="icon">💻</span> <span data-i18n="software">Logiciels</span></div>
+            <div class="card expert-only">
+                <div class="card-title"><span class="icon">💻</span> <span data-i18n="software">Logiciels</span> <span class="expert-badge">Expert</span></div>
 
                 <div id="softwareList">
                     <!-- Dynamic rows inserted by JS -->
@@ -1523,7 +1519,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="machine_wattage">Puissance machine (W)</label>
-                        <input type="number" class="form-input" id="machineWattage" value="135" min="0">
+                        <input type="number" class="form-input" id="machineWattage" value="0" min="0">
                         <p class="form-hint" data-i18n="wattage_hint">Consommation moyenne de votre machine</p>
                     </div>
                 </div>
@@ -1558,7 +1554,7 @@
             </div>
 
             <!-- RÉSUMÉ : COÛT HORAIRE STRUCTURE (toujours en dernier) -->
-            <div class="summary-box mt-16" id="globalHourlyBox">
+            <div class="summary-box mt-16 expert-only" id="globalHourlyBox">
                 <div class="summary-label" data-i18n="global_hourly_label">À titre indicatif — Coût horaire de votre structure</div>
                 <div class="summary-value" id="globalHourlyValue">25.00€/h</div>
                 <div class="summary-detail" data-i18n="global_hourly_detail">Prenant en compte les éléments ci-dessus (salaire + machines + logiciels)</div>
@@ -1571,8 +1567,8 @@
             <p class="step-subtitle" data-i18n="step5_subtitle">Intégrez vos coûts d'apprentissage</p>
 
             <!-- PROTOTYPES -->
-            <div class="card">
-                <div class="card-title"><span class="icon">🧪</span> <span data-i18n="prototypes">Prototypes</span></div>
+            <div class="card expert-only">
+                <div class="card-title"><span class="icon">🧪</span> <span data-i18n="prototypes">Prototypes</span> <span class="expert-badge">Expert</span></div>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -1599,8 +1595,8 @@
             </div>
 
             <!-- ERREURS INTERNES -->
-            <div class="card">
-                <div class="card-title"><span class="icon">⚠️</span> <span data-i18n="errors">Erreurs internes</span></div>
+            <div class="card expert-only">
+                <div class="card-title"><span class="icon">⚠️</span> <span data-i18n="errors">Erreurs internes</span> <span class="expert-badge">Expert</span></div>
                 <p class="text-muted mb-8" data-i18n="errors_desc">Lissage du coût des productions ratées</p>
                 
                 <div class="form-row" style="align-items: end;">
@@ -2448,7 +2444,10 @@
         /* ===== MODULE : NAVIGATION ===== */
 
         function getSteps() {
-            return STEPS[currentProductionType] || STEPS.unique;
+            const all = STEPS[currentProductionType] || STEPS.unique;
+            if (expertMode) return all;
+            // Normal mode: skip step 5 (Prototypes & Errors)
+            return all.filter(s => s.num !== 5);
         }
 
         function renderStepper() {
@@ -2621,6 +2620,15 @@
                 numField.readOnly = !expertMode;
                 numField.style.background = expertMode ? 'var(--card)' : 'var(--bg)';
             }
+            // Re-render stepper (step 5 visible only in expert)
+            const steps = getSteps();
+            if (!steps.find(s => s.num === currentStep)) {
+                currentStep = steps[steps.length - 1].num;
+                showStep(currentStep);
+            }
+            renderStepper();
+            updateNavFooter();
+            updateStepCount();
         }
 
         function updateExpertIndicator() {
